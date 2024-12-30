@@ -1,0 +1,368 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "PBL API",
+        "description": "API for News Project PBL Politeknik Negeri Bali 2024",
+        "contact": {
+            "email": "leasehat@gmail.com"
+        },
+        "license": {
+            "name": "",
+            "url": ""
+        },
+        "version": "1.0.0",
+        "x-logo": {
+            "url": "https://via.placeholder.com/190x90.png?text=L5-Swagger"
+        }
+    },
+    "paths": {
+        "/api/news": {
+            "get": {
+                "tags": [
+                    "News"
+                ],
+                "summary": "Get list of news with limit option",
+                "description": "Returns a list of news with their category, user, and tags. Optionally limit the number of news.",
+                "operationId": "getNewsList",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit the number of news. If not provided, returns all news.",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    }
+                }
+            }
+        },
+        "/api/news/page": {
+            "get": {
+                "tags": [
+                    "News"
+                ],
+                "summary": "Get list of news with pagination",
+                "description": "Returns a list of news with pagination and limit options.",
+                "operationId": "getNewsListPaginate",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit the number of news",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    }
+                }
+            }
+        },
+        "/api/news/{id}": {
+            "get": {
+                "tags": [
+                    "News"
+                ],
+                "summary": "Get news by ID",
+                "description": "Returns a specific news article by ID",
+                "operationId": "getNewsById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "News ID",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "404": {
+                        "description": "News not found"
+                    }
+                }
+            }
+        },
+        "/api/news/category/{slug}": {
+            "get": {
+                "tags": [
+                    "News"
+                ],
+                "summary": "Get news by category with limit option",
+                "description": "Returns news filtered by category slug. Optionally limit the number of news.",
+                "operationId": "getNewsByCategory",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "Category slug",
+                        "required": true
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit the number of news. If not provided, returns all news from the category.",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "404": {
+                        "description": "Category not found"
+                    }
+                }
+            }
+        },
+        "/api/news/category/{slug}/page": {
+            "get": {
+                "tags": [
+                    "News"
+                ],
+                "summary": "Get news by category with pagination",
+                "description": "Returns news filtered by category slug with pagination.",
+                "operationId": "getNewsByCategoryPaginate",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "Category slug",
+                        "required": true
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit the number of news",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "404": {
+                        "description": "Category not found"
+                    }
+                }
+            }
+        },
+        "/api/news/tag/{tagName}": {
+            "get": {
+                "tags": [
+                    "News"
+                ],
+                "summary": "Get news by tag with limit option",
+                "description": "Returns news filtered by tag name. Optionally limit the number of news.",
+                "operationId": "getNewsByTag",
+                "parameters": [
+                    {
+                        "name": "tagName",
+                        "in": "path",
+                        "description": "Tag name",
+                        "required": true
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit the number of news. If not provided, returns all news for the tag.",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "404": {
+                        "description": "Tag not found"
+                    }
+                }
+            }
+        },
+        "/api/news/tag/{tagName}/page": {
+            "get": {
+                "tags": [
+                    "News"
+                ],
+                "summary": "Get news by tag with pagination",
+                "description": "Returns news filtered by tag name with pagination.",
+                "operationId": "getNewsByTagPaginate",
+                "parameters": [
+                    {
+                        "name": "tagName",
+                        "in": "path",
+                        "description": "Tag name",
+                        "required": true
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit the number of news per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "404": {
+                        "description": "Tag not found"
+                    }
+                }
+            }
+        },
+        "/api/news/author/{id}": {
+            "get": {
+                "tags": [
+                    "News"
+                ],
+                "summary": "Get news by author with limit option",
+                "description": "Returns news filtered by user ID. Optionally limit the number of news.",
+                "operationId": "getNewsByAuthor",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit the number of news. If not provided, returns all news by the author.",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            }
+        },
+        "/api/news/author/{id}/page": {
+            "get": {
+                "tags": [
+                    "News"
+                ],
+                "summary": "Get news by author with pagination",
+                "description": "Returns news filtered by user ID with pagination.",
+                "operationId": "getNewsByAuthorPaginate",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit the number of news per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "News",
+            "description": "News"
+        }
+    ]
+}

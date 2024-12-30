@@ -1,0 +1,30 @@
+@import '/vendor/filament/filament/resources/css/theme.css';
+
+@config 'tailwind.config.js';
+
+.fi-sidebar-item-active > a { 
+    @apply bg-primary-200;
+ 
+    & > svg, span {
+        @apply text-white;
+    }
+ 
+    &:hover {
+        @apply bg-primary-400;
+    }
+} 
+
+.fi-sidebar {
+    @apply bg-primary-500;
+ 
+}
+
+.fi-sidebar-header {
+    @apply bg-primary-500;
+ 
+
+}
+.fi-topbar {
+    @apply bg-primary-200;
+ 
+}
