@@ -69,26 +69,6 @@ class NewsResource extends Resource
                             ->multiple()
                             ->relationship('tags', 'name')
                             ->disabled(),
-
-                        Forms\Components\Toggle::make('verified_at')
-                            ->label(
-                                fn($record) =>
-                                $record && !is_null($record->verified_at) && $record->updated_at > $record->verified_at
-                                    ? (app()->getLocale() === 'id' ? 'Verifikasi Ulang' : 'Re-Verify')
-                                    : (app()->getLocale() === 'id' ? 'Verifikasi' : 'Verified')
-                            )
-                            ->helperText(app()->getLocale() === 'id'
-                                ? 'Aktifkan atau aktifkan ulang untuk menandai berita sebagai terverifikasi.'
-                                : 'Enable re-enable to mark the news as verified.')
-                            ->onColor('success')
-                            ->offColor('danger')
-                            ->inline(false)
-                            ->dehydrated()
-                            ->beforeStateDehydrated(function ($state, callable $set) {
-                                $set('verified_at', $state ? now()->addSeconds(10) : null);
-                            })
-                            ->default(fn($record) => !is_null($record?->verified_at)),
-
                     ])
                     ->columns(1),
 
@@ -102,10 +82,32 @@ class NewsResource extends Resource
                     ])
                     ->columns(1),
 
-                Forms\Components\TextInput::make('title')
+                Forms\Components\Textarea::make('title')
                     ->label(app()->getLocale() === 'id' ? 'Judul' : 'Title')
                     ->columnSpanFull()
                     ->readOnly(),
+                Forms\Components\Select::make('user_id')
+                    ->disabled()
+                    ->label(app()->getLocale() === 'id' ? 'Penulis' : 'Author')
+                    ->relationship('user', 'name'),
+                Forms\Components\Toggle::make('verified_at')
+                    ->label(
+                        fn($record) =>
+                        $record && !is_null($record->verified_at) && $record->updated_at > $record->verified_at
+                            ? (app()->getLocale() === 'id' ? 'Verifikasi Ulang' : 'Re-Verify')
+                            : (app()->getLocale() === 'id' ? 'Verifikasi' : 'Verified')
+                    )
+                    ->helperText(app()->getLocale() === 'id'
+                        ? 'Aktifkan atau aktifkan ulang untuk menandai berita sebagai terverifikasi.'
+                        : 'Enable re-enable to mark the news as verified.')
+                    ->onColor('success')
+                    ->offColor('danger')
+                    ->inline(false)
+                    ->dehydrated()
+                    ->beforeStateDehydrated(function ($state, callable $set) {
+                        $set('verified_at', $state ? now()->addSeconds(10) : null);
+                    })
+                    ->default(fn($record) => !is_null($record?->verified_at)),
                 Forms\Components\Textarea::make('description')
                     ->label(app()->getLocale() === 'id' ? 'Deskripsi' : 'Description')
                     ->columnSpanFull()
