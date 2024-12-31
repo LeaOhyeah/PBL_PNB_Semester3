@@ -111,6 +111,11 @@ class MyNewsResource extends Resource
                             ->columnSpan(1),
                         Forms\Components\TextInput::make('content_url')
                             ->label('ID Video')
+			    ->unique(ignoreRecord: true)
+			    ->required()
+			    ->validationMessages([
+                        	'required' => 'Data wajib diisi',
+                        	'unique' => app()->getLocale() === 'id' ? 'Nama kategori tersebut sudah tersedia' : 'The :attribute has already been taken',])
                             ->readOnly()
                             ->helperText('ID Video yang akan disimpan')
                             ->columnSpan(1),
