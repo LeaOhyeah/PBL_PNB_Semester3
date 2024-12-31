@@ -8,7 +8,7 @@ use Illuminate\Routing\Controller as BaseController;
 
 /**
  * @OA\Info(
- *      version="1.0.0",
+ *      version="env('API_VERSION')",
  *      x={
  *          "logo": {
  *              "url": "https://via.placeholder.com/190x90.png?text=L5-Swagger"

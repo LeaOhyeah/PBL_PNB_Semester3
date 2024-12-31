@@ -36,14 +36,16 @@ Route::prefix('news')->group(function () {
     Route::get('/category/{slug}/page', [NewsApiController::class, 'getByCategoryPaginate']);
 
     // Menampilkan berita berdasarkan tag name
-    Route::get('/tag/{tagName}', [NewsApiController::class, 'getByTag']);
+    // Route::get('/tag/{tagName}', [NewsApiController::class, 'getByTag']);
 
     // Menampilkan berita berdasarkan tag name dengan pagination dan limit
-    Route::get('/tag/{tagName}/page', [NewsApiController::class, 'getByTagPaginate']);
+    // Route::get('/tag/{tagName}/page', [NewsApiController::class, 'getByTagPaginate']);
 
     // Menampilkan berita berdasarkan user_id (dalam hal ini menggunakan ID user)
-    Route::get('/author/{id}', [NewsApiController::class, 'getByAuthor']);
+    // Route::get('/author/{id}', [NewsApiController::class, 'getByAuthor']);
 
     // Menampilkan berita berdasarkan user_id (dalam hal ini menggunakan ID user) dengan pagination dan limit
-    Route::get('/author/{id}/page', [NewsApiController::class, 'getByAuthorPaginate']);
+    // Route::get('/author/{id}/page', [NewsApiController::class, 'getByAuthorPaginate']);
 });
+
+Route::get('/categories', [NewsApiController::class, 'indexCategories']);

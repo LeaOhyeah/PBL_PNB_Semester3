@@ -10,7 +10,7 @@
             "name": "",
             "url": ""
         },
-        "version": "1.0.0",
+        "version": "env('API_VERSION')",
         "x-logo": {
             "url": "https://via.placeholder.com/190x90.png?text=L5-Swagger"
         }
@@ -21,67 +21,218 @@
                 "tags": [
                     "News"
                 ],
-                "summary": "Get list of news with limit option",
-                "description": "Returns a list of news with their category, user, and tags. Optionally limit the number of news.",
-                "operationId": "getNewsList",
+                "summary": "Get latest news",
+                "operationId": "e3674deb5b90eb199ddc95a0f23545b9",
                 "parameters": [
                     {
                         "name": "limit",
                         "in": "query",
-                        "description": "Limit the number of news. If not provided, returns all news.",
+                        "description": "Limit the number of news items",
                         "required": false,
                         "schema": {
                             "type": "integer",
-                            "default": 10
+                            "example": 10
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful operation"
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "version": {
+                                            "type": "number",
+                                            "example": 3.1
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "News fetched successfully"
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "list": {
+                                                    "properties": {
+                                                        "latest_news": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/NewsItem"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "400": {
-                        "description": "Bad request"
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "version": {
+                                            "type": "number",
+                                            "example": 3.1
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invalid input parameter"
+                                        },
+                                        "errors": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "example": "The limit parameter must be a positive integer."
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 }
             }
         },
-        "/api/news/page": {
+        "/api/categories": {
             "get": {
                 "tags": [
-                    "News"
+                    "Categories"
                 ],
-                "summary": "Get list of news with pagination",
-                "description": "Returns a list of news with pagination and limit options.",
-                "operationId": "getNewsListPaginate",
+                "summary": "Get list of categories",
+                "operationId": "18dbd6cb8d98cfb468e19e2a80367d49",
                 "parameters": [
                     {
                         "name": "limit",
                         "in": "query",
-                        "description": "Limit the number of news",
+                        "description": "Limit the number of categories",
                         "required": false,
                         "schema": {
                             "type": "integer",
-                            "default": 10
-                        }
-                    },
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Page number for pagination",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 1
+                            "example": 10
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful operation"
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "version": {
+                                            "type": "number",
+                                            "example": 3.1
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Categories fetched successfully"
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 5
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "list": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "Technology"
+                                                            },
+                                                            "slug": {
+                                                                "type": "string",
+                                                                "example": "technology"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "400": {
-                        "description": "Bad request"
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "version": {
+                                            "type": "number",
+                                            "example": 3.1
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invalid input parameter"
+                                        },
+                                        "errors": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "example": "The limit parameter must be a positive integer."
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -92,22 +243,90 @@
                     "News"
                 ],
                 "summary": "Get news by ID",
-                "description": "Returns a specific news article by ID",
+                "description": "Returns a specific news article by ID, including related news based on similar titles",
                 "operationId": "getNewsById",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
                         "description": "News ID",
-                        "required": true
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": 1
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful operation"
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "version": {
+                                            "type": "string",
+                                            "example": "1.0.1"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "News fetched successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "news": {
+                                                    "$ref": "#/components/schemas/News"
+                                                },
+                                                "related": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/News"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "News not found"
+                        "description": "News not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "version": {
+                                            "type": "string",
+                                            "example": "1.0.1"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "News not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -117,33 +336,106 @@
                 "tags": [
                     "News"
                 ],
-                "summary": "Get news by category with limit option",
-                "description": "Returns news filtered by category slug. Optionally limit the number of news.",
-                "operationId": "getNewsByCategory",
+                "summary": "Get news by category",
+                "operationId": "d9fe667bf00e9810142bd40c675a99b5",
                 "parameters": [
                     {
                         "name": "slug",
                         "in": "path",
-                        "description": "Category slug",
-                        "required": true
+                        "description": "Slug of the category",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "technology"
+                        }
                     },
                     {
                         "name": "limit",
                         "in": "query",
-                        "description": "Limit the number of news. If not provided, returns all news from the category.",
+                        "description": "Limit the number of news items",
                         "required": false,
                         "schema": {
                             "type": "integer",
-                            "default": 10
+                            "example": 10
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful operation"
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "version": {
+                                            "type": "number",
+                                            "example": 3.1
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "News fetched successfully"
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "list": {
+                                                    "properties": {
+                                                        "latest_news": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/NewsItem"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "Category not found"
+                        "description": "Category not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "version": {
+                                            "type": "number",
+                                            "example": 3.1
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Category not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -153,209 +445,410 @@
                 "tags": [
                     "News"
                 ],
-                "summary": "Get news by category with pagination",
-                "description": "Returns news filtered by category slug with pagination.",
-                "operationId": "getNewsByCategoryPaginate",
+                "summary": "Get paginated news by category",
+                "operationId": "c5a0f1f2dcda9276163775c2eb09e386",
                 "parameters": [
                     {
                         "name": "slug",
                         "in": "path",
-                        "description": "Category slug",
-                        "required": true
+                        "description": "Slug of the category",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "event"
+                        }
                     },
                     {
                         "name": "limit",
                         "in": "query",
-                        "description": "Limit the number of news",
+                        "description": "Number of news items per page (default: 10)",
                         "required": false,
                         "schema": {
                             "type": "integer",
-                            "default": 10
+                            "example": 2
                         }
                     },
                     {
                         "name": "page",
                         "in": "query",
-                        "description": "Page number for pagination",
+                        "description": "Page number for pagination (default: 1)",
                         "required": false,
                         "schema": {
                             "type": "integer",
-                            "default": 1
+                            "example": 1
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful operation"
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "version": {
+                                            "type": "string",
+                                            "example": "1.0.1"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "News paginate fetched successfully"
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 6
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "example": "5936a72b-10f8-4e75-9713-0a8b5e1910b4"
+                                                            },
+                                                            "user_id": {
+                                                                "type": "integer",
+                                                                "example": 2
+                                                            },
+                                                            "category_id": {
+                                                                "type": "integer",
+                                                                "example": 3
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "Ogoh ogoh denpasar 2025 keren dan super detail 🔥🔥🔥"
+                                                            },
+                                                            "content_url": {
+                                                                "type": "string",
+                                                                "example": "LCevkk0DEV8"
+                                                            },
+                                                            "verified_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2024-12-27 12:02:32"
+                                                            },
+                                                            "description": {
+                                                                "type": "string",
+                                                                "example": "updated now"
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2024-12-27T03:02:32.000000Z"
+                                                            },
+                                                            "updated_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2024-12-27T04:02:22.000000Z"
+                                                            },
+                                                            "category": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer",
+                                                                        "example": 3
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "Event"
+                                                                    },
+                                                                    "slug": {
+                                                                        "type": "string",
+                                                                        "example": "event"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            },
+                                                            "user": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer",
+                                                                        "example": 2
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "Admin Adit"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            },
+                                                            "tags": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "object"
+                                                                }
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "first_page_url": {
+                                                    "type": "string",
+                                                    "example": "http://127.0.0.1:8000/api/news/category/event/page?page=1"
+                                                },
+                                                "from": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "last_page_url": {
+                                                    "type": "string",
+                                                    "example": "http://127.0.0.1:8000/api/news/category/event/page?page=3"
+                                                },
+                                                "links": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "url": {
+                                                                "type": "string",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "label": {
+                                                                "type": "string",
+                                                                "example": "pagination.previous"
+                                                            },
+                                                            "active": {
+                                                                "type": "boolean",
+                                                                "example": false
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "next_page_url": {
+                                                    "type": "string",
+                                                    "example": "http://127.0.0.1:8000/api/news/category/event/page?page=2"
+                                                },
+                                                "path": {
+                                                    "type": "string",
+                                                    "example": "http://127.0.0.1:8000/api/news/category/event/page"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "prev_page_url": {
+                                                    "type": "string",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "to": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 6
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "Category not found"
+                        "description": "Category not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "version": {
+                                            "type": "string",
+                                            "example": "1.0.1"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Category not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 }
             }
-        },
-        "/api/news/tag/{tagName}": {
-            "get": {
-                "tags": [
-                    "News"
-                ],
-                "summary": "Get news by tag with limit option",
-                "description": "Returns news filtered by tag name. Optionally limit the number of news.",
-                "operationId": "getNewsByTag",
-                "parameters": [
-                    {
-                        "name": "tagName",
-                        "in": "path",
-                        "description": "Tag name",
-                        "required": true
+        }
+    },
+    "components": {
+        "schemas": {
+            "NewsItem": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "kasdbf734ijwkhdb"
                     },
-                    {
-                        "name": "limit",
-                        "in": "query",
-                        "description": "Limit the number of news. If not provided, returns all news for the tag.",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 10
+                    "title": {
+                        "type": "string",
+                        "example": "Sample News Title"
+                    },
+                    "content_url": {
+                        "type": "string",
+                        "example": "image_back_end.png"
+                    },
+                    "short_desc": {
+                        "type": "string",
+                        "example": "Short description here"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-12-25T09:50:49.000Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-12-28T11:27:50.422Z"
+                    },
+                    "category": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 123
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "Prestasi"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "writer": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 123
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "Author Name"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "id": {
+                                    "type": "integer",
+                                    "example": 123
+                                },
+                                "name": {
+                                    "type": "string",
+                                    "example": "coding"
+                                }
+                            },
+                            "type": "object"
                         }
                     }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation"
+                },
+                "type": "object"
+            },
+            "News": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "5124982c-c7f5-4979-988f-4ef8fec17918"
                     },
-                    "404": {
-                        "description": "Tag not found"
-                    }
-                }
-            }
-        },
-        "/api/news/tag/{tagName}/page": {
-            "get": {
-                "tags": [
-                    "News"
-                ],
-                "summary": "Get news by tag with pagination",
-                "description": "Returns news filtered by tag name with pagination.",
-                "operationId": "getNewsByTagPaginate",
-                "parameters": [
-                    {
-                        "name": "tagName",
-                        "in": "path",
-                        "description": "Tag name",
-                        "required": true
+                    "title": {
+                        "type": "string",
+                        "example": "Ogoh ogoh denpasar 2025 keren dan super detail 🔥🔥🔥"
                     },
-                    {
-                        "name": "limit",
-                        "in": "query",
-                        "description": "Limit the number of news per page",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 10
-                        }
+                    "content_url": {
+                        "type": "string",
+                        "example": "LCevkk0DEV8"
                     },
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Page number for pagination",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 1
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation"
+                    "description": {
+                        "type": "string",
+                        "example": "updated now"
                     },
-                    "404": {
-                        "description": "Tag not found"
-                    }
-                }
-            }
-        },
-        "/api/news/author/{id}": {
-            "get": {
-                "tags": [
-                    "News"
-                ],
-                "summary": "Get news by author with limit option",
-                "description": "Returns news filtered by user ID. Optionally limit the number of news.",
-                "operationId": "getNewsByAuthor",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "User ID",
-                        "required": true
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-12-27T03:02:32.000000Z"
                     },
-                    {
-                        "name": "limit",
-                        "in": "query",
-                        "description": "Limit the number of news. If not provided, returns all news by the author.",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 10
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-12-27T04:02:22.000000Z"
+                    },
+                    "category": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 3
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "Event"
+                            },
+                            "slug": {
+                                "type": "string",
+                                "example": "event"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "user": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 2
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "Admin Adit"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "id": {
+                                    "type": "integer",
+                                    "example": 123
+                                },
+                                "name": {
+                                    "type": "string",
+                                    "example": "culture"
+                                }
+                            },
+                            "type": "object"
                         }
                     }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation"
-                    },
-                    "404": {
-                        "description": "User not found"
-                    }
-                }
-            }
-        },
-        "/api/news/author/{id}/page": {
-            "get": {
-                "tags": [
-                    "News"
-                ],
-                "summary": "Get news by author with pagination",
-                "description": "Returns news filtered by user ID with pagination.",
-                "operationId": "getNewsByAuthorPaginate",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "User ID",
-                        "required": true
-                    },
-                    {
-                        "name": "limit",
-                        "in": "query",
-                        "description": "Limit the number of news per page",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 10
-                        }
-                    },
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Page number for pagination",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 1
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation"
-                    },
-                    "404": {
-                        "description": "User not found"
-                    }
-                }
+                },
+                "type": "object"
             }
         }
     },
@@ -363,6 +856,10 @@
         {
             "name": "News",
             "description": "News"
+        },
+        {
+            "name": "Categories",
+            "description": "Categories"
         }
     ]
 }
