@@ -7,13 +7,14 @@ use App\Models\News;
 use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Pgvector\Laravel\Distance;
 
 class NewsApiController extends Controller
 {
     // done
     /**
      * @OA\Get(
-     *     path="/api/news",
+     *     path="/api/news/home",
      *     summary="Get latest news",
      *     tags={"News"},
      *     @OA\Parameter(
@@ -205,6 +206,104 @@ class NewsApiController extends Controller
         return response()->json($response, 200);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/news",
+     *     summary="Search news",
+     *     tags={"News"},
+     *     @OA\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         required=false,
+     *         description="Limit the number of news items",
+     *         @OA\Schema(type="integer", example=10)
+     *     ),
+     *     @OA\Parameter(
+     *         name="search",
+     *         in="query",
+     *         required=false,
+     *         description="Search keyword for news",
+     *         @OA\Schema(type="string", example="technology")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="version", type="number", example=3.1),
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="code", type="integer", example=200),
+     *             @OA\Property(property="message", type="string", example="News fetched successfully"),
+     *             @OA\Property(property="total", type="integer", example=10),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="list", type="array",
+     *                         @OA\Items(ref="#/components/schemas/NewsItem")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad Request",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="version", type="number", example=3.1),
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="code", type="integer", example=400),
+     *             @OA\Property(property="message", type="string", example="Invalid input parameter"),
+     *             @OA\Property(property="errors", type="array",
+     *                 @OA\Items(type="string", example="The limit parameter must be a positive integer.")
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function search(Request $request)
+    {
+        $limit = $request->input('limit');
+        $search = $request->input('search');
+
+        if ($limit !== null && (!is_numeric($limit) || $limit < 0)) {
+            return response()->json([
+                "version" => env('APP_VERSION'),
+                "status" => "error",
+                "code" => 400,
+                "message" => "Invalid input parameter",
+                "errors" => ["The limit parameter must be a positive integer."]
+            ], 400);
+        }
+
+        $latestNewsQuery = News::with(['category', 'user', 'tags'])
+            ->where('verified_at', '!=', null)
+            ->orderBy('created_at', 'desc');
+
+        if ($search) {
+            $latestNewsQuery->where(function ($query) use ($search) {
+                $query->where('title', 'like', "%$search%")
+                    ->orWhere('description', 'like', "%$search%")
+                    ->orWhereHas('tags', function ($tagQuery) use ($search) {
+                        $tagQuery->where('name', 'like', "%$search%");
+                    });
+            });
+        }
+
+        $latesNews = $limit ? $latestNewsQuery->limit($limit)->get() : $latestNewsQuery->get();
+
+        $response = [
+            "version" => env('APP_VERSION'),
+            "status" => "success",
+            "code" => 200,
+            "message" => "News fetched successfully",
+            "total" => $latesNews->count(),
+            "data" => [
+                "list" => $latesNews->map(fn($news) => $this->formatNewsData($news))
+                
+            ]
+        ];
+
+        return response()->json($response, 200);
+    }
+
 
     // done
     /**
@@ -329,6 +428,39 @@ class NewsApiController extends Controller
 
         return response()->json($response, 200);
     }
+
+
+    // public function findById($id)
+    // {
+    //     $news = News::with(['category:id,name,slug', 'user:id,name', 'tags:id,name'])
+    //         ->select('id', 'title', 'category_id', 'user_id', 'embedding')
+    //         ->find($id);
+
+    //     if (!$news) {
+    //         return response()->json([
+    //             "version" => env('APP_VERSION'),
+    //             "status" => "error",
+    //             "code" => 404,
+    //             "message" => "News not found"
+    //         ], 404);
+    //     }
+
+    //     $relatedNews = $news->nearestNeighbors('embedding', Distance::L2)->take(10)->get();
+
+    //     // Format response
+    //     $response = [
+    //         "version" => env('APP_VERSION'),
+    //         "status" => "success",
+    //         "code" => 200,
+    //         "message" => "News fetched successfully",
+    //         "data" => [
+    //             "news" => $news,
+    //             "related" => $relatedNews
+    //         ]
+    //     ];
+
+    //     return response()->json($response, 200);
+    // }
 
 
     // done

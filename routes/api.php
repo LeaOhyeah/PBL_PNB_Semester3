@@ -20,8 +20,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::prefix('news')->group(function () {
+    // search
+    Route::get('/', [NewsApiController::class, 'search']);
+    
     // Menampilkan semua berita
-    Route::get('/', [NewsApiController::class, 'index']);
+    Route::get('/home', [NewsApiController::class, 'index']);
 
     // Menampilkan semua berita dengan pagination dan limit
     Route::get('/page', [NewsApiController::class, 'indexPaginate']);

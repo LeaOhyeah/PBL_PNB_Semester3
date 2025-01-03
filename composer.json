@@ -15,6 +15,7 @@
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
+        "pgvector/pgvector": "^0.2.0",
         "saade/filament-laravel-log": "^3.0"
     },
     "require-dev": {
