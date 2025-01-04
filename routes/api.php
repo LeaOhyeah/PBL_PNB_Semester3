@@ -30,7 +30,7 @@ Route::prefix('news')->group(function () {
     Route::get('/page', [NewsApiController::class, 'indexPaginate']);
 
     // Menampilkan berita berdasarkan ID
-    Route::get('/{id}', [NewsApiController::class, 'findById']);
+    Route::get('/detail/{id}', [NewsApiController::class, 'findById']);
 
     // Menampilkan berita berdasarkan category slug
     Route::get('/category/{slug}', [NewsApiController::class, 'getByCategory']);
