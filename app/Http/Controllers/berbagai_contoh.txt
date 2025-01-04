@@ -1,0 +1,86 @@
+contoh ketiga
+
+public function index(Request $request)
+    {
+        $limit = $request->input('limit');
+        if ($limit !== null && (!is_numeric($limit) || $limit < 0)) {
+            return response()->json([
+                "version" => env('APP_VERSION'),
+                "status" => "error",
+                "code" => 400,
+                "message" => "Invalid input parameter",
+                "errors" => ["The limit parameter must be a positive integer."]
+            ], 400);
+        }
+
+        $latestNewsQuery = News::with(['category', 'user', 'tags'])->where('verified_at', '!=', null)->orderBy('created_at', 'desc');
+        $latesNews = $limit ? $latestNewsQuery->limit($limit)->get() : $latestNewsQuery->get();
+
+        $response = [
+            "version" => env('APP_VERSION'),
+            "status" => "success",
+            "code" => 200,
+            "message" => "News fetched successfully",
+            "total" => $latesNews->count(),
+            "data" => [
+                "list" => [
+                    "latest_news" => $latesNews->map(fn($news) => $this->formatNewsData($news))
+                ]
+            ]
+        ];
+
+        return response()->json($response, 200);
+    }
+
+
+contoh ke empat
+
+public function index(Request $request)
+    {
+        $limit = $request->input('limit') ?? 5;
+
+        // Validasi input limit
+        if ($limit !== null && (!is_numeric($limit) || $limit < 0)) {
+            return response()->json([
+                "version" => env('APP_VERSION'),
+                "status" => "error",
+                "code" => 400,
+                "message" => "Invalid input parameter",
+                "errors" => ["The limit parameter must be a positive integer."]
+            ], 400);
+        }
+
+        $categories = Category::with('news')->orderBy('created_at', 'desc')->limit(4)->get()->map(function ($category) use ($limit) {
+            $category->setRelation('news', $category->news->where('verified_at', '!=', null)->take($limit));
+            return $category;
+        });
+
+        $latestNewsQuery = News::with(['category', 'user', 'tags',])
+            ->where('verified_at', '!=', null)
+            ->orderBy('created_at', 'desc');
+
+        $latestNews = $latestNewsQuery->limit($limit)->get();
+
+        // Format response
+        $response = [
+            "version" => env('APP_VERSION'),
+            "status" => "success",
+            "code" => 200,
+            "message" => "",
+            "page" => 1,
+            "total" => 1,
+            "data" => [
+                "latest_news" => $latestNews->map(fn($news) => $this->formatNewsData($news)),
+                "segment" => $categories->map(function ($category) {
+                    return [
+                        "id" => $category->id,
+                        "name" => $category->name,
+                        "slug" => $category->slug,
+                        "news" => $category->news->map(fn($news) => $this->formatNewsData($news))
+                    ];
+                })
+            ]
+        ];
+
+        return response()->json($response, 200);
+    }

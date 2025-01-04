@@ -21,7 +21,7 @@
                 "tags": [
                     "News"
                 ],
-                "summary": "Get latest news",
+                "summary": "Get the latest news and category segments",
                 "operationId": "19c6d94327b5431f5843d6c333ad9c1e",
                 "parameters": [
                     {
@@ -31,7 +31,7 @@
                         "required": false,
                         "schema": {
                             "type": "integer",
-                            "example": 10
+                            "example": 5
                         }
                     }
                 ],
@@ -56,24 +56,49 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "News fetched successfully"
+                                            "example": ""
+                                        },
+                                        "page": {
+                                            "type": "integer",
+                                            "example": 1
                                         },
                                         "total": {
                                             "type": "integer",
-                                            "example": 10
+                                            "example": 1
                                         },
                                         "data": {
                                             "properties": {
-                                                "list": {
-                                                    "properties": {
-                                                        "latest_news": {
-                                                            "type": "array",
-                                                            "items": {
-                                                                "$ref": "#/components/schemas/NewsItem"
+                                                "latest_news": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/NewsItem"
+                                                    }
+                                                },
+                                                "segment": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 123
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "Prestasi"
+                                                            },
+                                                            "slug": {
+                                                                "type": "string",
+                                                                "example": "prestasi"
+                                                            },
+                                                            "news": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "$ref": "#/components/schemas/NewsItem"
+                                                                }
                                                             }
-                                                        }
-                                                    },
-                                                    "type": "object"
+                                                        },
+                                                        "type": "object"
+                                                    }
                                                 }
                                             },
                                             "type": "object"
@@ -839,6 +864,10 @@
                         "format": "date-time",
                         "example": "2024-12-28T11:27:50.422Z"
                     },
+                    "segment": {
+                        "type": "string",
+                        "example": "prestasi"
+                    },
                     "category": {
                         "properties": {
                             "id": {
@@ -848,6 +877,10 @@
                             "name": {
                                 "type": "string",
                                 "example": "Prestasi"
+                            },
+                            "slug": {
+                                "type": "string",
+                                "example": "prestasi"
                             }
                         },
                         "type": "object"

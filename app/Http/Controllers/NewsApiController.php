@@ -11,18 +11,17 @@ use Pgvector\Laravel\Distance;
 
 class NewsApiController extends Controller
 {
-    // done
     /**
      * @OA\Get(
      *     path="/api/news/home",
-     *     summary="Get latest news",
+     *     summary="Get the latest news and category segments",
      *     tags={"News"},
      *     @OA\Parameter(
      *         name="limit",
      *         in="query",
      *         required=false,
      *         description="Limit the number of news items",
-     *         @OA\Schema(type="integer", example=10)
+     *         @OA\Schema(type="integer", example=5)
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -32,13 +31,21 @@ class NewsApiController extends Controller
      *             @OA\Property(property="version", type="number", example=3.1),
      *             @OA\Property(property="status", type="string", example="success"),
      *             @OA\Property(property="code", type="integer", example=200),
-     *             @OA\Property(property="message", type="string", example="News fetched successfully"),
-     *             @OA\Property(property="total", type="integer", example=10),
+     *             @OA\Property(property="message", type="string", example=""),
+     *             @OA\Property(property="page", type="integer", example=1),
+     *             @OA\Property(property="total", type="integer", example=1),
      *             @OA\Property(property="data", type="object",
-     *                 @OA\Property(property="list", type="object",
-     *                     
-     *                     @OA\Property(property="latest_news", type="array",
-     *                         @OA\Items(ref="#/components/schemas/NewsItem")
+     *                 @OA\Property(property="latest_news", type="array",
+     *                     @OA\Items(ref="#/components/schemas/NewsItem")
+     *                 ),
+     *                 @OA\Property(property="segment", type="array",
+     *                     @OA\Items(type="object",
+     *                         @OA\Property(property="id", type="integer", example=123),
+     *                         @OA\Property(property="name", type="string", example="Prestasi"),
+     *                         @OA\Property(property="slug", type="string", example="prestasi"),
+     *                         @OA\Property(property="news", type="array",
+     *                             @OA\Items(ref="#/components/schemas/NewsItem")
+     *                         )
      *                     )
      *                 )
      *             )
@@ -69,9 +76,11 @@ class NewsApiController extends Controller
      *     @OA\Property(property="short_desc", type="string", example="Short description here"),
      *     @OA\Property(property="created_at", type="string", format="date-time", example="2024-12-25T09:50:49.000Z"),
      *     @OA\Property(property="updated_at", type="string", format="date-time", example="2024-12-28T11:27:50.422Z"),
+     *     @OA\Property(property="segment", type="string", example="prestasi"),
      *     @OA\Property(property="category", type="object",
      *         @OA\Property(property="id", type="integer", example=123),
-     *         @OA\Property(property="name", type="string", example="Prestasi")
+     *         @OA\Property(property="name", type="string", example="Prestasi"),
+     *         @OA\Property(property="slug", type="string", example="prestasi")
      *     ),
      *     @OA\Property(property="writer", type="object",
      *         @OA\Property(property="id", type="integer", example=123),
@@ -87,7 +96,9 @@ class NewsApiController extends Controller
      */
     public function index(Request $request)
     {
-        $limit = $request->input('limit');
+        $limit = $request->input('limit') ?? 5;
+
+        // Validasi input limit
         if ($limit !== null && (!is_numeric($limit) || $limit < 0)) {
             return response()->json([
                 "version" => env('APP_VERSION'),
@@ -98,24 +109,72 @@ class NewsApiController extends Controller
             ], 400);
         }
 
-        $latestNewsQuery = News::with(['category', 'user', 'tags'])->where('verified_at', '!=', null)->orderBy('created_at', 'desc');
-        $latesNews = $limit ? $latestNewsQuery->limit($limit)->get() : $latestNewsQuery->get();
+        $categories = Category::with('news')->orderBy('created_at', 'desc')->limit(4)->get()->map(function ($category) use ($limit) {
+            $category->setRelation('news', $category->news->where('verified_at', '!=', null)->take($limit));
+            return $category;
+        });
 
+        $latestNewsQuery = News::with(['category', 'user', 'tags',])
+            ->where('verified_at', '!=', null)
+            ->orderBy('created_at', 'desc');
+
+        $latestNews = $latestNewsQuery->limit($limit)->get();
+
+        // Format response
         $response = [
             "version" => env('APP_VERSION'),
             "status" => "success",
             "code" => 200,
-            "message" => "News fetched successfully",
-            "total" => $latesNews->count(),
+            "message" => "",
+            "page" => 1,
+            "total" => 1,
             "data" => [
-                "list" => [
-                    "latest_news" => $latesNews->map(fn($news) => $this->formatNewsData($news))
-                ]
+                "latest_news" => $latestNews->map(fn($news) => $this->formatNewsData($news)),
+                "segment" => $categories->map(function ($category) {
+                    return [
+                        "id" => $category->id,
+                        "name" => $category->name,
+                        "slug" => $category->slug,
+                        "news" => $category->news->map(fn($news) => $this->formatNewsData($news))
+                    ];
+                })
             ]
         ];
 
         return response()->json($response, 200);
     }
+
+    /**
+     * Format individual news data for response.
+     */
+    private function formatNewsData($news)
+    {
+        return [
+            "id" => $news->id,
+            "title" => $news->title,
+            "content_url" => $news->content_url,
+            "short_desc" => $news->short_desc,
+            "created_at" => $news->created_at->toIso8601String(),
+            "updated_at" => $news->updated_at->toIso8601String(),
+            "segment" => $news->category->slug ?? null,
+            "category" => [
+                "id" => $news->category->id ?? null,
+                "name" => $news->category->name ?? null,
+                "slug" => $news->category->slug ?? null,
+            ],
+            "writer" => [
+                "id" => $news->user->id ?? null,
+                "name" => $news->user->name ?? null,
+            ],
+            "tags" => $news->tags->map(fn($tag) => [
+                "id" => $tag->id,
+                "name" => $tag->name,
+            ]),
+        ];
+    }
+
+
+
 
     // done
     /**
@@ -184,7 +243,7 @@ class NewsApiController extends Controller
         }
 
         // Query kategori
-        $categoriesQuery = Category::query()->where('verified_at', '!=', null)->orderBy('name', 'asc');
+        $categoriesQuery = Category::query()->orderBy('name', 'asc');
         $categories = $limit ? $categoriesQuery->limit($limit)->get() : $categoriesQuery->get();
 
         // Format respons
@@ -297,7 +356,7 @@ class NewsApiController extends Controller
             "total" => $latesNews->count(),
             "data" => [
                 "list" => $latesNews->map(fn($news) => $this->formatNewsData($news))
-                
+
             ]
         ];
 
@@ -683,27 +742,27 @@ class NewsApiController extends Controller
     /**
      * Helper function to format a news item.
      */
-    private function formatNewsData($news)
-    {
-        return [
-            "id" => $news->id,
-            "title" => $news->title,
-            "content_url" => $news->content_url,
-            "short_desc" => $news->short_desc,
-            "created_at" => $news->created_at->toIso8601String(),
-            "updated_at" => $news->updated_at->toIso8601String(),
-            "category" => [
-                "id" => $news->category->id,
-                "name" => $news->category->name,
-            ],
-            "writer" => [
-                "id" => $news->user->id,
-                "name" => $news->user->name,
-            ],
-            "tags" => $news->tags->map(fn($tag) => [
-                "id" => $tag->id,
-                "name" => $tag->name,
-            ])
-        ];
-    }
+    // private function formatNewsData($news)
+    // {
+    //     return [
+    //         "id" => $news->id,
+    //         "title" => $news->title,
+    //         "content_url" => $news->content_url,
+    //         "short_desc" => $news->short_desc,
+    //         "created_at" => $news->created_at->toIso8601String(),
+    //         "updated_at" => $news->updated_at->toIso8601String(),
+    //         "category" => [
+    //             "id" => $news->category->id,
+    //             "name" => $news->category->name,
+    //         ],
+    //         "writer" => [
+    //             "id" => $news->user->id,
+    //             "name" => $news->user->name,
+    //         ],
+    //         "tags" => $news->tags->map(fn($tag) => [
+    //             "id" => $tag->id,
+    //             "name" => $tag->name,
+    //         ])
+    //     ];
+    // }
 }
