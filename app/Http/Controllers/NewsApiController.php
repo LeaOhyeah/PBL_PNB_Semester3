@@ -156,6 +156,7 @@ class NewsApiController extends Controller
             "short_desc" => $news->short_desc,
             "created_at" => $news->created_at->toIso8601String(),
             "updated_at" => $news->updated_at->toIso8601String(),
+            "verified_at" => $news->updated_at->toIso8601String(),
             "segment" => $news->category->slug ?? null,
             "category" => [
                 "id" => $news->category->id ?? null,
