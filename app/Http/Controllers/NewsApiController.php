@@ -226,7 +226,7 @@ class NewsApiController extends Controller
             "id" => $news->id,
             "title" => $news->title,
             "content_url" => $news->content_url,
-            "short_desc" => $news->short_desc,
+            "short_desc" => $news->short_desc ?? "Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci suscipit autem, facilis delectus nostrum maiores natus. Deleniti temporibus molestias accusamus distinctio maxime inventore impedit exercitationem?.",
             "created_at" => $news->created_at->toIso8601String(),
             "updated_at" => $news->updated_at->toIso8601String(),
             "verified_at" => $news->updated_at->toIso8601String(),
