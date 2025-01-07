@@ -139,21 +139,21 @@ class NewsApiController extends Controller
             ], 400);
         }
 
-        if ($request->has('slug') || $request->has('page')) {
-            if (!$request->has('slug') || !$request->has('page')) {
-                return response()->json([
-                    "version" => env('APP_VERSION'),
-                    "status" => "error",
-                    "code" => 400,
-                    "message" => "Invalid input parameter",
-                    "errors" => [
-                        "The page must have slug."
-                    ]
-                ], 400);
-            }
-        }
+        // if ($request->has('slug') || $request->has('page')) {
+        //     if (!$request->has('slug') || !$request->has('page')) {
+        //         return response()->json([
+        //             "version" => env('APP_VERSION'),
+        //             "status" => "error",
+        //             "code" => 400,
+        //             "message" => "Invalid input parameter",
+        //             "errors" => [
+        //                 "The page must have slug."
+        //             ]
+        //         ], 400);
+        //     }
+        // }
 
-        if ($request->has('page')) {
+        if ($request->has('slug')) {
             // Fetch latest news with pagination
             $latestNewsQuery = News::with(['category', 'user', 'tags'])
                 ->where('verified_at', '!=', null)
@@ -202,13 +202,13 @@ class NewsApiController extends Controller
                 "page" => 1,
                 "total" => 1,
                 "data" => [
-                    "latest_news" => $latestNews->map(fn($news) => $this->formatNewsData($news)),
-                    "segment" => $categories->map(function ($category) {
+                    "latest_news" => $latestNews->values()->map(fn($news) => $this->formatNewsData($news)),
+                    "segment" => $categories->values()->map(function ($category) {
                         return [
                             "id" => $category->id,
                             "name" => $category->name,
                             "slug" => $category->slug,
-                            "news" => $category->news->map(fn($news) => $this->formatNewsData($news))
+                            "news" => $category->news->values()->map(fn($news) => $this->formatNewsData($news))
                         ];
                     })
                 ]
@@ -240,7 +240,7 @@ class NewsApiController extends Controller
                 "id" => $news->user->id ?? null,
                 "name" => $news->user->name ?? null,
             ],
-            "tags" => $news->tags->map(fn($tag) => [
+            "tags" => $news->tags->values()->map(fn($tag) => [
                 "id" => $tag->id,
                 "name" => $tag->name,
             ]),
@@ -326,7 +326,7 @@ class NewsApiController extends Controller
             "message" => "Categories fetched successfully",
             "total" => $categories->count(),
             "data" => [
-                "list" => $categories->map(fn($category) => [
+                "list" => $categories->values()->map(fn($category) => [
                     "id" => $category->id,
                     "name" => $category->name,
                     "slug" => $category->slug,
@@ -483,7 +483,7 @@ class NewsApiController extends Controller
                 ? env('APP_URL') . "/api/news/search?search=" . urlencode($search) . "&limit=" . $limit . "&page=" . ($newsList->currentPage() + 1)
                 : "",
             "data" => [
-                "list" => $newsList->map(fn($news) => $this->formatNewsData($news))
+                "list" => $newsList->values()->map(fn($news) => $this->formatNewsData($news))
             ]
         ];
 
@@ -646,7 +646,7 @@ class NewsApiController extends Controller
             "message" => "News fetched successfully",
             "data" => [
                 "news" => $this->formatNewsData($news),
-                "related" => $relatedNews->map(fn($related) => $this->formatNewsData($related))
+                "related" => $relatedNews->values()->map(fn($related) => $this->formatNewsData($related))
             ]
         ];
 
@@ -687,221 +687,4 @@ class NewsApiController extends Controller
     //     return response()->json($response, 200);
     // }
 
-
-
-    /**
-     * @OA\Get(
-     *     path="/api/news/category/{slug}",
-     *     summary="Get news by category",
-     *     tags={"News"},
-     *     @OA\Parameter(
-     *         name="slug",
-     *         in="path",
-     *         required=true,
-     *         description="Slug of the category",
-     *         @OA\Schema(type="string", example="technology")
-     *     ),
-     *     @OA\Parameter(
-     *         name="limit",
-     *         in="query",
-     *         required=false,
-     *         description="Limit the number of news items",
-     *         @OA\Schema(type="integer", example=10)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful response",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="version", type="number", example=3.1),
-     *             @OA\Property(property="status", type="string", example="success"),
-     *             @OA\Property(property="code", type="integer", example=200),
-     *             @OA\Property(property="message", type="string", example="News fetched successfully"),
-     *             @OA\Property(property="total", type="integer", example=10),
-     *             @OA\Property(property="data", type="object",
-     *                 @OA\Property(property="list", type="object",
-     *                     @OA\Property(property="latest_news", type="array",
-     *                         @OA\Items(ref="#/components/schemas/NewsItem")
-     *                     )
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Category not found",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="version", type="number", example=3.1),
-     *             @OA\Property(property="status", type="string", example="error"),
-     *             @OA\Property(property="code", type="integer", example=404),
-     *             @OA\Property(property="message", type="string", example="Category not found")
-     *         )
-     *     )
-     * )
-     */
-    public function getByCategory(Request $request, $slug)
-    {
-        // Validate category existence by slug
-        $category = Category::where('slug', $slug)->firstOrFail();
-
-        // Get limit from request (default is no limit)
-        $limit = $request->input('limit');
-        if ($limit !== null && (!is_numeric($limit) || $limit < 0)) {
-            return response()->json([
-                "version" => env('APP_VERSION'),
-                "status" => "error",
-                "code" => 400,
-                "message" => "Invalid input parameter",
-                "errors" => ["The limit parameter must be a positive integer."]
-            ], 400);
-        }
-
-        // Fetch news by category
-        $newsQuery = News::with(['category', 'user', 'tags'])
-            ->where('category_id', $category->id)
-            ->where('verified_at', '!=', null)
-            ->orderBy('created_at', 'desc');
-        $news = $limit ? $newsQuery->limit($limit)->get() : $newsQuery->get();
-
-        // Format response
-        $response = [
-            "version" => env('APP_VERSION'),
-            "status" => "success",
-            "code" => 200,
-            "message" => "News fetched successfully",
-            "total" => $news->count(),
-            "data" => [
-                "list" => [
-                    "latest_news" => $news->map(fn($item) => $this->formatNewsData($item))
-                ]
-            ]
-        ];
-
-        return response()->json($response, 200);
-    }
-
-
-    /**
-     * @OA\Get(
-     *     path="/api/news/category/{slug}/page",
-     *     summary="Get paginated news by category",
-     *     tags={"News"},
-     *     @OA\Parameter(
-     *         name="slug",
-     *         in="path",
-     *         required=true,
-     *         description="Slug of the category",
-     *         @OA\Schema(type="string", example="event")
-     *     ),
-     *     @OA\Parameter(
-     *         name="limit",
-     *         in="query",
-     *         required=false,
-     *         description="Number of news items per page (default: 10)",
-     *         @OA\Schema(type="integer", example=2)
-     *     ),
-     *     @OA\Parameter(
-     *         name="page",
-     *         in="query",
-     *         required=false,
-     *         description="Page number for pagination (default: 1)",
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful response",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="version", type="string", example="1.0.1"),
-     *             @OA\Property(property="status", type="string", example="success"),
-     *             @OA\Property(property="code", type="integer", example=200),
-     *             @OA\Property(property="message", type="string", example="News paginate fetched successfully"),
-     *             @OA\Property(property="total", type="integer", example=6),
-     *             @OA\Property(property="data", type="object",
-     *                 @OA\Property(property="current_page", type="integer", example=1),
-     *                 @OA\Property(property="data", type="array",
-     *                     @OA\Items(type="object",
-     *                         @OA\Property(property="id", type="string", example="5936a72b-10f8-4e75-9713-0a8b5e1910b4"),
-     *                         @OA\Property(property="user_id", type="integer", example=2),
-     *                         @OA\Property(property="category_id", type="integer", example=3),
-     *                         @OA\Property(property="title", type="string", example="Ogoh ogoh denpasar 2025 keren dan super detail 🔥🔥🔥"),
-     *                         @OA\Property(property="content_url", type="string", example="LCevkk0DEV8"),
-     *                         @OA\Property(property="verified_at", type="string", format="date-time", example="2024-12-27 12:02:32"),
-     *                         @OA\Property(property="description", type="string", example="updated now"),
-     *                         @OA\Property(property="created_at", type="string", format="date-time", example="2024-12-27T03:02:32.000000Z"),
-     *                         @OA\Property(property="updated_at", type="string", format="date-time", example="2024-12-27T04:02:22.000000Z"),
-     *                         @OA\Property(property="category", type="object",
-     *                             @OA\Property(property="id", type="integer", example=3),
-     *                             @OA\Property(property="name", type="string", example="Event"),
-     *                             @OA\Property(property="slug", type="string", example="event")
-     *                         ),
-     *                         @OA\Property(property="user", type="object",
-     *                             @OA\Property(property="id", type="integer", example=2),
-     *                             @OA\Property(property="name", type="string", example="Admin Adit")
-     *                         ),
-     *                         @OA\Property(property="tags", type="array", @OA\Items(type="object"))
-     *                     )
-     *                 ),
-     *                 @OA\Property(property="first_page_url", type="string", example="http://127.0.0.1:8000/api/news/category/event/page?page=1"),
-     *                 @OA\Property(property="from", type="integer", example=1),
-     *                 @OA\Property(property="last_page", type="integer", example=3),
-     *                 @OA\Property(property="last_page_url", type="string", example="http://127.0.0.1:8000/api/news/category/event/page?page=3"),
-     *                 @OA\Property(property="links", type="array", 
-     *                     @OA\Items(type="object",
-     *                         @OA\Property(property="url", type="string", nullable=true, example=null),
-     *                         @OA\Property(property="label", type="string", example="pagination.previous"),
-     *                         @OA\Property(property="active", type="boolean", example=false)
-     *                     )
-     *                 ),
-     *                 @OA\Property(property="next_page_url", type="string", example="http://127.0.0.1:8000/api/news/category/event/page?page=2"),
-     *                 @OA\Property(property="path", type="string", example="http://127.0.0.1:8000/api/news/category/event/page"),
-     *                 @OA\Property(property="per_page", type="integer", example=2),
-     *                 @OA\Property(property="prev_page_url", type="string", nullable=true, example=null),
-     *                 @OA\Property(property="to", type="integer", example=2),
-     *                 @OA\Property(property="total", type="integer", example=6)
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Category not found",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="version", type="string", example="1.0.1"),
-     *             @OA\Property(property="status", type="string", example="error"),
-     *             @OA\Property(property="code", type="integer", example=404),
-     *             @OA\Property(property="message", type="string", example="Category not found")
-     *         )
-     *     )
-     * )
-     */
-    public function getByCategoryPaginate(Request $request, $slug)
-    {
-        $category = Category::where('slug', $slug)->first();
-        if (!$category) {
-            return response()->json(['message' => 'Category not found'], 404);
-        }
-
-        $limit = $request->query('limit', 10); // Default limit to 10 if not provided
-        $page = $request->query('page', 1); // Default page to 1 if not provided
-
-        $news = News::with(['category:id,name,slug', 'user:id,name', 'tags:id,name'])
-            ->where('category_id', $category->id)
-            ->where('verified_at', '!=', null)
-            ->orderBy('created_at', 'desc')
-            ->paginate($limit);
-
-        $response = [
-            "version" => env('APP_VERSION'),
-            "status" => "success",
-            "code" => 200,
-            "message" => "News paginate fetched successfully",
-            "total" => $news->total(),
-            "data" =>
-            $news
-        ];
-
-        return response()->json($response, 200);
-    }
 }
