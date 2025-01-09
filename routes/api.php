@@ -21,13 +21,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::prefix('news')->group(function () {
     // search
-    Route::get('/', [NewsApiController::class, 'search']);
+    // Route::get('/', [NewsApiController::class, 'search']);
     
     // Menampilkan semua berita
     Route::get('/home', [NewsApiController::class, 'index']);
 
     // Menampilkan berita berdasarkan ID
-    Route::get('/detail/{id}', [NewsApiController::class, 'findById']);
+    // Route::get('/detail/{id}', [NewsApiController::class, 'findById']);
 
     // Menampilkan berita berdasarkan tag name
     // Route::get('/tag/{tagName}', [NewsApiController::class, 'getByTag']);

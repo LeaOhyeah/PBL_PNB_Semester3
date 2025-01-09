@@ -21,9 +21,19 @@
                 "tags": [
                     "News"
                 ],
-                "summary": "Get the latest news and category segments",
+                "summary": "Mendapatkan latest_news dan segment jika menggunakan /home, terdapat parameter seperti slug, title, author dan tag yang mengembalikan pagination\n     *              , terdapat parameter id yang mengembalikan news (detail berita) dan related_news",
                 "operationId": "19c6d94327b5431f5843d6c333ad9c1e",
                 "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "ID of the news item to fetch (optional)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "8cc48c8c-949b-478c-a7d7-3e8b33e4e204"
+                        }
+                    },
                     {
                         "name": "limit",
                         "in": "query",
@@ -63,6 +73,36 @@
                             "type": "string",
                             "example": "prestasi"
                         }
+                    },
+                    {
+                        "name": "title",
+                        "in": "query",
+                        "description": "Title keyword to filter news by title",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "breaking news"
+                        }
+                    },
+                    {
+                        "name": "author",
+                        "in": "query",
+                        "description": "Author name to filter news by author",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "John Doe"
+                        }
+                    },
+                    {
+                        "name": "tag",
+                        "in": "query",
+                        "description": "Tag name to filter news by tag",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "technology"
+                        }
                     }
                 ],
                 "responses": {
@@ -98,17 +138,15 @@
                                         },
                                         "next_url": {
                                             "type": "string",
-                                            "example": "http://example.com/api/news/home?slug=prestasi&limitPaginate=25&page=2"
+                                            "example": "http://example.com/api/news/home?slug=prestasi&title=example+title&limitPaginate=10&page=2"
+                                        },
+                                        "prev_url": {
+                                            "type": "string",
+                                            "example": "http://example.com/api/news/home?slug=prestasi&title=example+title&limitPaginate=10&page=1"
                                         },
                                         "data": {
                                             "properties": {
                                                 "latest_news": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "$ref": "#/components/schemas/NewsItem"
-                                                    }
-                                                },
-                                                "list": {
                                                     "type": "array",
                                                     "items": {
                                                         "$ref": "#/components/schemas/NewsItem"
@@ -291,194 +329,6 @@
                                             "items": {
                                                 "type": "string",
                                                 "example": "The limit parameter must be a positive integer."
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/news": {
-            "get": {
-                "tags": [
-                    "News"
-                ],
-                "summary": "Search news",
-                "description": "Fetch a list of news based on search criteria with pagination.",
-                "operationId": "searchNews",
-                "parameters": [
-                    {
-                        "name": "limit",
-                        "in": "query",
-                        "description": "Number of per page (default is 25).",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "minimum": 1,
-                            "example": 25
-                        }
-                    },
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "The page number for paginated results (default is 1).",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "minimum": 1,
-                            "example": 1
-                        }
-                    },
-                    {
-                        "name": "search",
-                        "in": "query",
-                        "description": "Keyword to search by title, description, or tags.",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "example": "Breaking News"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "News fetched successfully.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "version": {
-                                            "type": "string",
-                                            "example": "1.0.0"
-                                        },
-                                        "status": {
-                                            "type": "string",
-                                            "example": "success"
-                                        },
-                                        "code": {
-                                            "type": "integer",
-                                            "example": 200
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "News fetched successfully"
-                                        },
-                                        "page": {
-                                            "type": "integer",
-                                            "example": 1
-                                        },
-                                        "total": {
-                                            "type": "integer",
-                                            "example": 10
-                                        },
-                                        "next_url": {
-                                            "type": "string",
-                                            "example": "http://example.com/api/news/search?search=keyword&limit=25&page=2"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "list": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "properties": {
-                                                            "id": {
-                                                                "type": "integer",
-                                                                "example": 1
-                                                            },
-                                                            "title": {
-                                                                "type": "string",
-                                                                "example": "Breaking News Today"
-                                                            },
-                                                            "description": {
-                                                                "type": "string",
-                                                                "example": "This is the description of the news."
-                                                            },
-                                                            "category": {
-                                                                "properties": {
-                                                                    "id": {
-                                                                        "type": "integer",
-                                                                        "example": 2
-                                                                    },
-                                                                    "name": {
-                                                                        "type": "string",
-                                                                        "example": "Sports"
-                                                                    }
-                                                                },
-                                                                "type": "object"
-                                                            },
-                                                            "tags": {
-                                                                "type": "array",
-                                                                "items": {
-                                                                    "properties": {
-                                                                        "id": {
-                                                                            "type": "integer",
-                                                                            "example": 5
-                                                                        },
-                                                                        "name": {
-                                                                            "type": "string",
-                                                                            "example": "Football"
-                                                                        }
-                                                                    },
-                                                                    "type": "object"
-                                                                }
-                                                            },
-                                                            "user": {
-                                                                "properties": {
-                                                                    "id": {
-                                                                        "type": "integer",
-                                                                        "example": 3
-                                                                    },
-                                                                    "name": {
-                                                                        "type": "string",
-                                                                        "example": "John Doe"
-                                                                    }
-                                                                },
-                                                                "type": "object"
-                                                            }
-                                                        },
-                                                        "type": "object"
-                                                    }
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid input parameters.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "version": {
-                                            "type": "string",
-                                            "example": "1.0.0"
-                                        },
-                                        "status": {
-                                            "type": "string",
-                                            "example": "error"
-                                        },
-                                        "code": {
-                                            "type": "integer",
-                                            "example": 400
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Invalid input parameter"
-                                        },
-                                        "errors": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "string",
-                                                "example": "The limit, limit, and page parameters must be positive integers."
                                             }
                                         }
                                     },
@@ -724,6 +574,194 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Internal server error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/news": {
+            "get": {
+                "tags": [
+                    "News"
+                ],
+                "summary": "Search news",
+                "description": "Fetch a list of news based on search criteria with pagination.",
+                "operationId": "searchNews",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of per page (default is 25).",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "example": 25
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "The page number for paginated results (default is 1).",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Keyword to search by title, description, or tags.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "Breaking News"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "News fetched successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "version": {
+                                            "type": "string",
+                                            "example": "1.0.0"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "News fetched successfully"
+                                        },
+                                        "page": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "next_url": {
+                                            "type": "string",
+                                            "example": "http://example.com/api/news/search?search=keyword&limit=25&page=2"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "list": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "Breaking News Today"
+                                                            },
+                                                            "description": {
+                                                                "type": "string",
+                                                                "example": "This is the description of the news."
+                                                            },
+                                                            "category": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer",
+                                                                        "example": 2
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "Sports"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            },
+                                                            "tags": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "integer",
+                                                                            "example": 5
+                                                                        },
+                                                                        "name": {
+                                                                            "type": "string",
+                                                                            "example": "Football"
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                }
+                                                            },
+                                                            "user": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer",
+                                                                        "example": 3
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "John Doe"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input parameters.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "version": {
+                                            "type": "string",
+                                            "example": "1.0.0"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invalid input parameter"
+                                        },
+                                        "errors": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "example": "The limit, limit, and page parameters must be positive integers."
+                                            }
                                         }
                                     },
                                     "type": "object"
