@@ -149,4 +149,158 @@ class TampunganIde extends Controller
 
         return view('beranda', $data);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/api/news",
+     *     summary="Search news",
+     *     description="Fetch a list of news based on search criteria with pagination.",
+     *     operationId="searchNews",
+     *     tags={"News"},
+     *     @OA\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         description="Number of per page (default is 25).",
+     *         required=false,
+     *         @OA\Schema(type="integer", minimum=1, example=25)
+     *     ),
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="The page number for paginated results (default is 1).",
+     *         required=false,
+     *         @OA\Schema(type="integer", minimum=1, example=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="search",
+     *         in="query",
+     *         description="Keyword to search by title, description, or tags.",
+     *         required=false,
+     *         @OA\Schema(type="string", example="Breaking News")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="News fetched successfully.",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="version", type="string", example="1.0.0"),
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="code", type="integer", example=200),
+     *             @OA\Property(property="message", type="string", example="News fetched successfully"),
+     *             @OA\Property(property="page", type="integer", example=1),
+     *             @OA\Property(property="total", type="integer", example=10),
+     *             @OA\Property(property="next_url", type="string", example="http://example.com/api/news/search?search=keyword&limit=25&page=2"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="list",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="title", type="string", example="Breaking News Today"),
+     *                         @OA\Property(property="description", type="string", example="This is the description of the news."),
+     *                         @OA\Property(
+     *                             property="category",
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer", example=2),
+     *                             @OA\Property(property="name", type="string", example="Sports")
+     *                         ),
+     *                         @OA\Property(
+     *                             property="tags",
+     *                             type="array",
+     *                             @OA\Items(
+     *                                 type="object",
+     *                                 @OA\Property(property="id", type="integer", example=5),
+     *                                 @OA\Property(property="name", type="string", example="Football")
+     *                             )
+     *                         ),
+     *                         @OA\Property(
+     *                             property="user",
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer", example=3),
+     *                             @OA\Property(property="name", type="string", example="John Doe")
+     *                         )
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid input parameters.",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="version", type="string", example="1.0.0"),
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="code", type="integer", example=400),
+     *             @OA\Property(property="message", type="string", example="Invalid input parameter"),
+     *             @OA\Property(
+     *                 property="errors",
+     *                 type="array",
+     *                 @OA\Items(type="string", example="The limit, limit, and page parameters must be positive integers.")
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function search(Request $request)
+    {
+        $limit = $request->input('limit') ?? 25;
+        $page = $request->input('page') ?? 1;
+        $search = $request->input('search');
+
+        // Validasi input
+        if ((!is_numeric($limit) || $limit < 1) || (!is_numeric($page) || $page < 1)) {
+            return response()->json([
+                "version" => env('APP_VERSION'),
+                "status" => "error",
+                "code" => 400,
+                "message" => "Invalid input parameter",
+                "errors" => [
+                    "The limit, limit, and page parameters must be positive integers."
+                ]
+            ], 400);
+        }
+
+        // Query berita
+        $newsQuery = News::with(['category', 'user', 'tags'])
+            ->where('verified_at', '!=', null)
+            ->orderBy('created_at', 'desc');
+
+        // Filter berdasarkan parameter pencarian
+        if ($search) {
+            $newsQuery->where(function ($query) use ($search) {
+                $query->where('title', 'LIKE', "%$search%")
+                    ->orWhere('description', 'LIKE', "%$search%")
+                    ->orWhereHas('tags', function ($tagQuery) use ($search) {
+                        $tagQuery->where('name', 'LIKE', "%$search%");
+                    });
+            });
+        }
+
+        // Paginasi atau batasan jumlah berita
+        $newsList = $newsQuery->paginate($limit, ['*'], 'page', $page);
+
+        // Format respons
+        $response = [
+            "version" => env('APP_VERSION'),
+            "status" => "success",
+            "code" => 200,
+            "message" => "News fetched successfully",
+            "page" => $newsList->currentPage(),
+            "total" => $newsList->lastPage(),
+            "next_url" => $newsList->currentPage() < $newsList->lastPage()
+                ? env('APP_URL') . "/api/news/search?search=" . urlencode($search) . "&limit=" . $limit . "&page=" . ($newsList->currentPage() + 1)
+                : "",
+            "data" => [
+                "list" => $newsList->values()->map(fn($news) => $this->formatNewsData($news))
+            ]
+        ];
+
+        return response()->json($response, 200);
+    }
+
+    
 }
