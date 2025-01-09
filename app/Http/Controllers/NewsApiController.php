@@ -14,8 +14,7 @@ class NewsApiController extends Controller
     /**
      * @OA\Get(
      *     path="/api/news/home",
-     *     summary="Mendapatkan latest_news dan segment jika menggunakan /home, terdapat parameter seperti slug, title, author dan tag yang mengembalikan pagination
-     *              , terdapat parameter id yang mengembalikan news (detail berita) dan related_news",
+     *     summary="Mendapatkan latest_news dan segment jika menggunakan /home, terdapat parameter seperti slug, title, author dan tag yang mengembalikan pagination, terdapat parameter id yang mengembalikan news (detail berita) dan related_news",
      *     tags={"News"},
      *     @OA\Parameter(
      *     name="id",
@@ -315,7 +314,6 @@ class NewsApiController extends Controller
     }
 
 
-    // done
     /**
      * @OA\Get(
      *     path="/api/categories",
@@ -405,110 +403,7 @@ class NewsApiController extends Controller
     }
 
 
-    /**
-     * @OA\Get(
-     *     path="/api/news/detail/{id}",
-     *     summary="Retrieve a single news item by its ID",
-     *     description="Fetch a news item along with related news based on its title",
-     *     tags={"News"},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         description="ID of the news item to fetch",
-     *         @OA\Schema(type="string", example="1451e622-95bd-412e-a82f-d8cc41ad35f3")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successfully retrieved the news item",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="version", type="string", example="1.0"),
-     *             @OA\Property(property="status", type="string", example="success"),
-     *             @OA\Property(property="code", type="integer", example=200),
-     *             @OA\Property(property="message", type="string", example="News fetched successfully"),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="object",
-     *                 @OA\Property(
-     *                     property="news",
-     *                     type="object",
-     *                     description="Details of the requested news item",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="title", type="string", example="Breaking News: Major Event"),
-     *                     @OA\Property(property="description", type="string", example="A major event has taken place, drawing global attention."),
-     *                     @OA\Property(property="category", type="object", 
-     *                         @OA\Property(property="id", type="integer", example=2),
-     *                         @OA\Property(property="name", type="string", example="World News"),
-     *                         @OA\Property(property="slug", type="string", example="world-news")
-     *                     ),
-     *                     @OA\Property(property="user", type="object",
-     *                         @OA\Property(property="id", type="integer", example=1),
-     *                         @OA\Property(property="name", type="string", example="John Doe")
-     *                     ),
-     *                     @OA\Property(property="tags", type="array", 
-     *                         @OA\Items(
-     *                             type="object",
-     *                             @OA\Property(property="id", type="integer", example=3),
-     *                             @OA\Property(property="name", type="string", example="Breaking")
-     *                         )
-     *                     )
-     *                 ),
-     *                 @OA\Property(
-     *                     property="related",
-     *                     type="array",
-     *                     description="List of related news items",
-     *                     @OA\Items(
-     *                         type="object",
-     *                         @OA\Property(property="id", type="integer", example=2),
-     *                         @OA\Property(property="title", type="string", example="Related News: Updates on the Major Event"),
-     *                         @OA\Property(property="description", type="string", example="Further updates on the major event are now available."),
-     *                         @OA\Property(property="category", type="object", 
-     *                             @OA\Property(property="id", type="integer", example=2),
-     *                             @OA\Property(property="name", type="string", example="World News"),
-     *                             @OA\Property(property="slug", type="string", example="world-news")
-     *                         ),
-     *                         @OA\Property(property="user", type="object",
-     *                             @OA\Property(property="id", type="integer", example=4),
-     *                             @OA\Property(property="name", type="string", example="Jane Smith")
-     *                         ),
-     *                         @OA\Property(property="tags", type="array", 
-     *                             @OA\Items(
-     *                                 type="object",
-     *                                 @OA\Property(property="id", type="integer", example=3),
-     *                                 @OA\Property(property="name", type="string", example="Breaking")
-     *                             )
-     *                         )
-     *                     )
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="News item not found",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="version", type="string", example="1.0"),
-     *             @OA\Property(property="status", type="string", example="error"),
-     *             @OA\Property(property="code", type="integer", example=404),
-     *             @OA\Property(property="message", type="string", example="News not found")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Internal server error",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="version", type="string", example="1.0"),
-     *             @OA\Property(property="status", type="string", example="error"),
-     *             @OA\Property(property="code", type="integer", example=500),
-     *             @OA\Property(property="message", type="string", example="Internal server error")
-     *         )
-     *     )
-     * )
-     */
-    public function findById($id)
+    private function findById($id)
     {
         $news = News::with(['category:id,name,slug', 'user:id,name', 'tags:id,name'])->find($id);
 
