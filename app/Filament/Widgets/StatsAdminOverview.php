@@ -95,7 +95,7 @@ class StatsAdminOverview extends BaseWidget
                 ? (($newsThisWeek - $newsLastWeek) / $newsLastWeek) * 100
                 : null;
 
-            // Total semua berita
+            // Total semua berita   
             $totalNews = MyNews::count();
         }
 
