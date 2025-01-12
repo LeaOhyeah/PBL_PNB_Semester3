@@ -87,11 +87,11 @@
                     {
                         "name": "author",
                         "in": "query",
-                        "description": "Author name to filter news by author",
+                        "description": "Author id to filter news by author",
                         "required": false,
                         "schema": {
-                            "type": "string",
-                            "example": "John Doe"
+                            "type": "integer",
+                            "example": 1
                         }
                     },
                     {

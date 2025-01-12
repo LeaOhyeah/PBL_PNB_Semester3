@@ -62,8 +62,8 @@ class NewsApiController extends Controller
      *         name="author",
      *         in="query",
      *         required=false,
-     *         description="Author name to filter news by author",
-     *         @OA\Schema(type="string", example="John Doe")
+     *         description="Author id to filter news by author",
+     *         @OA\Schema(type="integer", example=1)
      *     ),
      *     @OA\Parameter(
      *         name="tag",
@@ -193,7 +193,7 @@ class NewsApiController extends Controller
 
             // Filter author
             if ($author) {
-                $newsQuery->whereRelation('user', 'email', 'LIKE', "%$author%");
+                $newsQuery->whereRelation('user', 'id', $author);
             }
 
             // Filter tag
