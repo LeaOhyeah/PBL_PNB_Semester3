@@ -9,12 +9,12 @@ return new class extends Migration
 {
     public function up()
     {
-        DB::statement("ALTER TABLE news ADD COLUMN embedding vector(384);");
+        // DB::statement("ALTER TABLE news ADD COLUMN embedding vector(384);");
     }
     
     public function down()
     {
-        DB::statement("ALTER TABLE news DROP COLUMN embedding;");
+        // DB::statement("ALTER TABLE news DROP COLUMN embedding;");
     }
     
 };
