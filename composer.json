@@ -10,6 +10,7 @@
         "darkaonline/l5-swagger": "^8.6",
         "filament/filament": "^3.2",
         "guzzlehttp/guzzle": "^7.2",
+        "irazasyed/telegram-bot-sdk": "^3.14",
         "joaopaulolndev/filament-edit-profile": "^1.0",
         "kenepa/translation-manager": "^4.0",
         "laravel/framework": "^10.10",
