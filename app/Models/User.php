@@ -37,7 +37,8 @@ class User extends Authenticatable implements HasAvatar, MustVerifyEmail
         'name',
         'email',
         'password',
-        'avatar_url'
+        'avatar_url',
+        'telegram_id'
     ];
 
     /**
