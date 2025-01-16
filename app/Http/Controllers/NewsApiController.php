@@ -246,7 +246,7 @@ class NewsApiController extends Controller
             ];
         } else {
             // home default (latest and segment)
-            $categories = Category::with('news')->orderBy('created_at', 'desc')->limit(4)->get()->map(function ($category) use ($limit) {
+            $categories = Category::with('news')->orderBy('created_at', 'desc')->get()->map(function ($category) use ($limit) {
                 $category->setRelation('news', $category->news->where('verified_at', '!=', null)->take($limit));
                 return $category;
             });
