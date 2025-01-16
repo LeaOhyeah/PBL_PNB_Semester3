@@ -1,0 +1,6 @@
+curl hanya tersedia di windows 10 ke atas yang paling baru dan secara default ada di semua os linux dan mac
+
+linux
+set     :   curl -X GET "https://api.telegram.org/bot<TOKEN>/setWebhook?url=<URL>/webhook"
+delete  :   curl -X GET "https://api.telegram.org/bot<TOKEN>/deleteWebhook"
+
