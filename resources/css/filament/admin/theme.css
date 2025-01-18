@@ -3,8 +3,19 @@
 @config 'tailwind.config.js';
 
 .fi-sidebar-item-active > a { 
-    @apply bg-primary-200;
+    @apply bg-primary-800;
+    /* background-color: purple; */
  
+    & > svg, span {
+        @apply text-white;
+    }
+ 
+    &:hover {
+        @apply bg-primary-400;
+    }
+} 
+
+.fi-sidebar-item > a { 
     & > svg, span {
         @apply text-white;
     }
@@ -27,4 +38,20 @@
 .fi-topbar {
     @apply bg-primary-200;
  
+}
+
+span .fi-badge{
+    @apply bg-primary-800;
+}
+
+.fi-logo{
+    @apply text-white;
+}
+
+.fi-sidebar-group-label{
+    @apply text-white;
+}
+
+.choices__item.choices__item--selectable{
+    @apply text-black;
 }

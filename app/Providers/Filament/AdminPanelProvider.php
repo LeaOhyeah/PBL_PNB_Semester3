@@ -39,8 +39,8 @@ class AdminPanelProvider extends PanelProvider
             ->registration()
             ->emailVerification()
             ->colors([
-                'primary' => Color::Yellow,
-                'secondary' => Color::Orange,
+                'primary' => Color::Purple,
+                // 'secondary' => Color::,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
