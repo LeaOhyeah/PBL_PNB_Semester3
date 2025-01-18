@@ -101,40 +101,44 @@ class StatsAdminOverview extends BaseWidget
 
         $language = app()->getLocale();
 
-         // Tentukan label dan deskripsi berdasarkan bahasa
-         $thisMonthLabel = $language === 'id' ? 'Jumlah berita diterbitkan bulan ini' : 'Number of news published this month';
-         $lastMonthLabel = $language === 'id' ? 'Jumlah berita diterbitkan bulan lalu' : 'Number of news published last month';
-         $monthlyGrowthLabel = $language === 'id' ? 'Persentase kenaikan dari bulan lalu' : 'Percentage growth from last month';
-         $thisWeekLabel = $language === 'id' ? 'Jumlah berita diterbitkan minggu ini' : 'Number of news published this week';
-         $lastWeekLabel = $language === 'id' ? 'Jumlah berita diterbitkan minggu lalu' : 'Number of news published last week';
-         $weeklyGrowthLabel = $language === 'id' ? 'Persentase kenaikan dari minggu lalu' : 'Percentage growth from last week';
+        // Tentukan label dan deskripsi berdasarkan bahasa
+        $labels = [
+            'thisMonth' => $language === 'id' ? 'Total Bulan Ini' : 'Total This Month',
+            'lastMonth' => $language === 'id' ? 'Bulan Lalu' : 'Last Month',
+            'monthlyGrowth' => $language === 'id' ? 'Kenaikan Bulanan' : 'Monthly Growth',
+            'thisWeek' => $language === 'id' ? 'Total Minggu Ini' : 'Total This Week',
+            'lastWeek' => $language === 'id' ? 'Minggu Lalu' : 'Last Week',
+            'weeklyGrowth' => $language === 'id' ? 'Kenaikan Mingguan' : 'Weekly Growth',
+        ];
+
+        $descriptions = [
+            'thisMonth' => $language === 'id' ? 'Jumlah berita diterbitkan bulan ini' : 'Number of news published this month',
+            'lastMonth' => $language === 'id' ? 'Jumlah berita diterbitkan bulan lalu' : 'Number of news published last month',
+            'monthlyGrowth' => $language === 'id' ? 'Persentase kenaikan dari bulan lalu' : 'Percentage growth from last month',
+            'thisWeek' => $language === 'id' ? 'Jumlah berita diterbitkan minggu ini' : 'Number of news published this week',
+            'lastWeek' => $language === 'id' ? 'Jumlah berita diterbitkan minggu lalu' : 'Number of news published last week',
+            'weeklyGrowth' => $language === 'id' ? 'Persentase kenaikan dari minggu lalu' : 'Percentage growth from last week',
+        ];
 
         return [
-
-            Stat::make('Total Bulan Ini', $newsThisMonth)
-                ->description($thisMonthLabel)
+            Stat::make($labels['thisMonth'], $newsThisMonth)
+                ->description($descriptions['thisMonth'])
                 ->color('success'),
-
-            Stat::make('Bulan Lalu', $newsLastMonth)
-                ->description($lastMonthLabel)
+            Stat::make($labels['lastMonth'], $newsLastMonth)
+                ->description($descriptions['lastMonth'])
                 ->color('secondary'),
-
-            Stat::make('Kenaikan Bulanan', $monthlyGrowthPercentage !== null ? number_format($monthlyGrowthPercentage, 2) . '%' : 'Tidak tersedia')
-                ->description($monthlyGrowthLabel)
+            Stat::make($labels['monthlyGrowth'], $monthlyGrowthPercentage !== null ? number_format($monthlyGrowthPercentage, 2) . '%' : 'Tidak tersedia')
+                ->description($descriptions['monthlyGrowth'])
                 ->color($monthlyGrowthPercentage > 0 ? 'success' : 'danger'),
-
-            Stat::make('Total Minggu Ini', $newsThisWeek)
-                ->description($thisWeekLabel)
+            Stat::make($labels['thisWeek'], $newsThisWeek)
+                ->description($descriptions['thisWeek'])
                 ->color('success'),
-
-            Stat::make('Minggu Lalu', $newsLastWeek)
-                ->description($lastWeekLabel)
+            Stat::make($labels['lastWeek'], $newsLastWeek)
+                ->description($descriptions['lastWeek'])
                 ->color('secondary'),
-
-            Stat::make('Kenaikan Mingguan', $weeklyGrowthPercentage !== null ? number_format($weeklyGrowthPercentage, 2) . '%' : 'Tidak tersedia')
-                ->description($weeklyGrowthLabel)
+            Stat::make($labels['weeklyGrowth'], $weeklyGrowthPercentage !== null ? number_format($weeklyGrowthPercentage, 2) . '%' : 'Tidak tersedia')
+                ->description($descriptions['weeklyGrowth'])
                 ->color($weeklyGrowthPercentage > 0 ? 'success' : 'danger'),
-
         ];
     }
 }
