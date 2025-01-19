@@ -21,9 +21,17 @@
     }
  
     &:hover {
-        @apply bg-primary-400;
+        background-color: white;
+        .fi-sidebar-item-label{
+                color: purple;
+        }
+        .fi-sidebar-item-icon{
+                color: purple;
+        }
     }
 } 
+
+
 
 .fi-sidebar {
     @apply bg-primary-500;
