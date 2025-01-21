@@ -156,130 +156,141 @@ class NewsApiController extends Controller
         $tag = $request->input('tag');
         $id = $request->input('id');
 
-        // find by id
         if ($id) {
             return $this->findById($id);
         }
 
-        // Validasi input
-        if ((!is_numeric($limit) || $limit < 0) || (!is_numeric($page) || $page < 1) || (!is_numeric($limitPaginate) || $limitPaginate < 1)) {
-            return response()->json([
-                "version" => env('APP_VERSION'),
-                "status" => "error",
-                "code" => 400,
-                "message" => "Invalid input parameter",
-                "errors" => [
-                    "The limit and page parameters must be positive integers."
-                ]
-            ], 400);
+        if (!$this->validateInput($limit, $limitPaginate, $page)) {
+            return $this->invalidInputResponse();
         }
 
-        // Filter by param
         if ($slug || $title || $author || $tag) {
-            // Query dasar
-            $newsQuery = News::with(['category', 'user', 'tags'])
-                ->where('verified_at', '!=', null)
-                ->orderBy('created_at', 'desc');
-
-            // Filter slug
-            if ($slug) {
-                $newsQuery->whereRelation('category', 'slug', $slug);
-            }
-
-            // Filter title
-            if ($title) {
-                $newsQuery->where('title', 'LIKE', "%$title%");
-            }
-
-            // Filter author
-            if ($author) {
-                $newsQuery->whereRelation('user', 'id', $author);
-            }
-
-            // Filter tag
-            if ($tag) {
-                $newsQuery->whereHas('tags', function ($query) use ($tag) {
-                    $query->where('name', 'LIKE', "%$tag%");
-                });
-            }
-
-            // Paginate query
-            $newsList = $newsQuery->paginate($limitPaginate, ['*'], 'page', $page);
-
-            // Get all param
-            $queryParams = [
-                'slug' => $slug,
-                'title' => $title,
-                'author' => $author,
-                'tag' => $tag,
-                'limitPaginate' => $limitPaginate,
-                'page' => $newsList->currentPage() + 1, // Tambahkan 1 ke halaman saat ini untuk next_url
-            ];
-
-            // Delete null param
-            $queryParams = array_filter($queryParams, function ($value) {
-                return !is_null($value) && $value !== '';
-            });
-
-            // Build next and prev url (if exist)
-            $nextUrl = $newsList->currentPage() < $newsList->lastPage()
-                ? env('APP_URL') . "/api/news/home?" . http_build_query($queryParams)
-                : "";
-
-            $prevUrl = $newsList->currentPage() > 1
-                ? env('APP_URL') . "/api/news/home?" . http_build_query(array_merge($queryParams, ['page' => $newsList->currentPage() - 1]))
-                : "";
-
-            // Format respons
-            $response = [
-                "version" => env('APP_VERSION'),
-                "status" => "success",
-                "code" => 200,
-                "message" => "",
-                "page" => $newsList->currentPage(),
-                "total" => $newsList->lastPage(),
-                "prev_url" => $prevUrl,
-                "next_url" => $nextUrl,
-                "data" => [
-                    "list" => $newsList->values()->map(fn($news) => $this->formatNewsData($news))
-                ]
-            ];
-        } else {
-            // home default (latest and segment)
-            $categories = Category::with('news')->orderBy('created_at', 'desc')->get()->map(function ($category) use ($limit) {
-                $category->setRelation('news', $category->news->where('verified_at', '!=', null)->take($limit));
-                return $category;
-            });
-
-            $latestNews = News::with(['category', 'user', 'tags'])
-                ->where('verified_at', '!=', null)
-                ->orderBy('created_at', 'desc')
-                ->limit($limit)
-                ->get();
-
-            // Format response
-            $response = [
-                "version" => env('APP_VERSION'),
-                "status" => "success",
-                "code" => 200,
-                "message" => "",
-                "page" => 1,
-                "total" => 1,
-                "data" => [
-                    "latest_news" => $latestNews->values()->map(fn($news) => $this->formatNewsData($news)),
-                    "segment" => $categories->values()->map(function ($category) {
-                        return [
-                            "id" => $category->id,
-                            "name" => $category->name,
-                            "slug" => $category->slug,
-                            "news" => $category->news->values()->map(fn($news) => $this->formatNewsData($news))
-                        ];
-                    })
-                ]
-            ];
+            return $this->filterAndPaginateNews($slug, $title, $author, $tag, $limitPaginate, $page);
         }
 
-        return response()->json($response, 200);
+        return $this->getDefaultHomeResponse($limit);
+    }
+
+    private function validateInput($limit, $limitPaginate, $page)
+    {
+        return is_numeric($limit) && $limit > 0 &&
+            is_numeric($limitPaginate) && $limitPaginate > 0 &&
+            is_numeric($page) && $page > 0;
+    }
+
+    private function invalidInputResponse()
+    {
+        return response()->json([
+            "version" => env('APP_VERSION'),
+            "status" => "error",
+            "code" => 400,
+            "message" => "Invalid input parameter",
+            "errors" => [
+                "The limit and page parameters must be positive integers."
+            ]
+        ], 400);
+    }
+
+    private function filterAndPaginateNews($slug, $title, $author, $tag, $limitPaginate, $page)
+    {
+        $newsQuery = News::with(['category', 'user', 'tags'])
+            ->where('verified_at', '!=', null)
+            ->orderBy('created_at', 'desc');
+
+        $this->applyFilters($newsQuery, $slug, $title, $author, $tag);
+
+        $newsList = $newsQuery->paginate($limitPaginate, ['*'], 'page', $page);
+
+        return response()->json($this->buildPaginatedResponse($newsList, $slug, $title, $author, $tag, $limitPaginate), 200);
+    }
+
+    private function applyFilters($query, $slug, $title, $author, $tag)
+    {
+        if ($slug) {
+            $query->whereRelation('category', 'slug', $slug);
+        }
+
+        if ($title) {
+            $query->where('title', 'LIKE', "%$title%");
+        }
+
+        if ($author) {
+            $query->whereRelation('user', 'id', $author);
+        }
+
+        if ($tag) {
+            $query->whereHas('tags', function ($q) use ($tag) {
+                $q->where('name', 'LIKE', "%$tag%");
+            });
+        }
+    }
+
+    private function buildPaginatedResponse($newsList, $slug, $title, $author, $tag, $limitPaginate)
+    {
+        $queryParams = array_filter([
+            'slug' => $slug,
+            'title' => $title,
+            'author' => $author,
+            'tag' => $tag,
+            'limitPaginate' => $limitPaginate,
+            'page' => $newsList->currentPage() + 1,
+        ]);
+
+        $nextUrl = $newsList->currentPage() < $newsList->lastPage()
+            ? env('APP_URL') . "/api/news/home?" . http_build_query($queryParams)
+            : "";
+
+        $prevUrl = $newsList->currentPage() > 1
+            ? env('APP_URL') . "/api/news/home?" . http_build_query(array_merge($queryParams, ['page' => $newsList->currentPage() - 1]))
+            : "";
+
+        return [
+            "version" => env('APP_VERSION'),
+            "status" => "success",
+            "code" => 200,
+            "message" => "",
+            "page" => $newsList->currentPage(),
+            "total" => $newsList->lastPage(),
+            "prev_url" => $prevUrl,
+            "next_url" => $nextUrl,
+            "data" => [
+                "list" => $newsList->values()->map(fn($news) => $this->formatNewsData($news))
+            ]
+        ];
+    }
+
+    private function getDefaultHomeResponse($limit)
+    {
+        $categories = Category::with('news')->orderBy('created_at', 'desc')->get()->map(function ($category) use ($limit) {
+            $category->setRelation('news', $category->news->where('verified_at', '!=', null)->take($limit));
+            return $category;
+        });
+
+        $latestNews = News::with(['category', 'user', 'tags'])
+            ->where('verified_at', '!=', null)
+            ->orderBy('created_at', 'desc')
+            ->limit($limit)
+            ->get();
+
+        return response()->json([
+            "version" => env('APP_VERSION'),
+            "status" => "success",
+            "code" => 200,
+            "message" => "",
+            "page" => 1,
+            "total" => 1,
+            "data" => [
+                "latest_news" => $latestNews->values()->map(fn($news) => $this->formatNewsData($news)),
+                "segment" => $categories->values()->map(function ($category) {
+                    return [
+                        "id" => $category->id,
+                        "name" => $category->name,
+                        "slug" => $category->slug,
+                        "news" => $category->news->values()->map(fn($news) => $this->formatNewsData($news))
+                    ];
+                })
+            ]
+        ], 200);
     }
 
 
@@ -292,7 +303,7 @@ class NewsApiController extends Controller
             "id" => $news->id,
             "title" => $news->title,
             "content_url" => $news->content_url,
-            "short_desc" => $news->short_desc ?? "Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci suscipit autem, facilis delectus nostrum maiores natus. Deleniti temporibus molestias accusamus distinctio maxime inventore impedit exercitationem?.",
+            "short_desc" => $news->description ?? "Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci suscipit autem, facilis delectus nostrum maiores natus. Deleniti temporibus molestias accusamus distinctio maxime inventore impedit exercitationem?.",
             "created_at" => $news->created_at->toIso8601String(),
             "updated_at" => $news->updated_at->toIso8601String(),
             "verified_at" => $news->updated_at->toIso8601String(),
