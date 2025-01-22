@@ -64,11 +64,12 @@ class NewsChart extends ChartWidget
         $postsVerified = $model
             ->selectRaw('EXTRACT(MONTH FROM verified_at) AS month, COUNT(*) AS total')
             ->whereYear('verified_at', $currentYear)
-            ->whereNotNull('verified_at')
-            ->groupBy('month', 'verified_at') // Tambahkan verified_at di sini
+            ->whereNotNull('verified_at') // Hindari nilai NULL
+            ->groupBy(DB::raw('EXTRACT(MONTH FROM verified_at)')) // Pastikan hanya bulan yang di-group
             ->orderBy('month')
             ->pluck('total', 'month')
             ->toArray();
+
 
 
         // Siapkan data lengkap (0 jika data tidak ada)
