@@ -135,6 +135,11 @@ class NewsResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->limit(40),
+                Tables\Columns\TextColumn::make('tags.name')
+                    ->label(app()->getLocale() === 'id' ? 'Tag' : 'Tags')
+                    ->sortable()
+                    ->toggleable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(app()->getLocale() === 'id' ? 'Dibuat pada' : 'Created at')
                     ->dateTime()
@@ -168,6 +173,15 @@ class NewsResource extends Resource
                     ->preload()
                     ->searchable()
                     ->relationship('user', 'name'),
+
+                // Filter Tags (Many-to-Many)
+                SelectFilter::make('tags')
+                    ->label(app()->getLocale() === 'id' ? 'Tagar' : 'Tags')
+                    ->multiple() // Memungkinkan memilih lebih dari satu tag
+                    ->columnSpanFull()
+                    ->preload()
+                    ->searchable()
+                    ->relationship('tags', 'name'),
 
                 Filter::make('created_at')
                     ->form([

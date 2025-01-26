@@ -111,11 +111,12 @@ class MyNewsResource extends Resource
                             ->columnSpan(1),
                         Forms\Components\TextInput::make('content_url')
                             ->label('ID Video')
-			    ->unique(ignoreRecord: true)
-			    ->required()
-			    ->validationMessages([
-                        	'required' => 'Data wajib diisi',
-                        	'unique' => app()->getLocale() === 'id' ? 'Nama kategori tersebut sudah tersedia' : 'The :attribute has already been taken',])
+                            // ->unique(ignoreRecord: true)
+                            ->required()
+                            ->validationMessages([
+                                'required' => 'Data wajib diisi',
+                                // 'unique' => app()->getLocale() === 'id' ? 'Konten tersebut sudah tersedia' : 'The :attribute has already been taken',
+                            ])
                             ->readOnly()
                             ->helperText('ID Video yang akan disimpan')
                             ->columnSpan(1),
@@ -174,6 +175,11 @@ class MyNewsResource extends Resource
                     ->sortable()
                     ->searchable()
                     ->limit(50),
+                Tables\Columns\TextColumn::make('tags.name')
+                    ->label(app()->getLocale() === 'id' ? 'Tag' : 'Tags')
+                    ->sortable()
+                    ->toggleable()
+                    ->searchable(), 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(app()->getLocale() === 'id' ? 'Dibuat pada' : 'Created at')
                     ->dateTime()
@@ -203,6 +209,15 @@ class MyNewsResource extends Resource
                     ->getStateUsing(fn($record) => 'https://img.youtube.com/vi/' . $record->content_url . '/hqdefault.jpg'),
             ])
             ->filters([
+                // Filter Tags (Many-to-Many)
+                SelectFilter::make('tags')
+                    ->label(app()->getLocale() === 'id' ? 'Tag' : 'Tags')
+                    ->multiple() // Memungkinkan memilih lebih dari satu tag
+                    ->columnSpanFull()
+                    ->preload()
+                    ->searchable()
+                    ->relationship('tags', 'name'),
+
                 Filter::make('created_at')
                     ->form([
                         DatePicker::make('created_at')
