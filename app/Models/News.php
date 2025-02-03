@@ -49,4 +49,9 @@ class News extends Model
             $news->id = (string) Str::uuid();
         });
     }
+
+    public function scopeVerified($query)
+    {
+        return $query->whereNotNull('verified_at');
+    }
 }
