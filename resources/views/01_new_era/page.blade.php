@@ -26,6 +26,39 @@
 
 </head>
 
+<style>
+    .container {
+        width: 100%;
+        padding-right: 15px;
+        padding-left: 15px;
+        margin-right: auto;
+        margin-left: auto;
+    }
+
+    @media (min-width: 576px) {
+        .container {
+            max-width: 540px;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .container {
+            max-width: 720px;
+        }
+    }
+
+    @media (min-width: 992px) {
+        .container {
+            max-width: 960px;
+        }
+    }
+
+    @media (min-width: 1200px) {
+        .container {
+            max-width: 90%;
+        }
+    }
+</style>
 
 <body>
 
@@ -104,7 +137,7 @@
                     <!-- Grid Berita -->
                     <div class="row">
                         @foreach ($news as $item)
-                            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                            <div class="col-lg-3 col-sm-6 mb-4">
                                 <div class="weekly2-single">
                                     <div class="weekly2-img">
                                         <img src="https://img.youtube.com/vi/{{ $item->content_url }}/hqdefault.jpg"
@@ -114,7 +147,7 @@
                                         @php echo $infoText($item) @endphp
                                         <h4>
                                             <a href="{{ route('news.show', $item->id) }}">
-                                                {{ Str::limit($item->title, 40) }}
+                                                {{ Str::limit($item->title, 50) }}
                                             </a>
                                         </h4>
                                     </div>

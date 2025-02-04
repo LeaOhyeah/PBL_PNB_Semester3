@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="{{ asset('template/assets/css/nice-select.css') }}">
     <link rel="stylesheet" href="{{ asset('template/assets/css/style.css') }}">
 
+    
     <style>
         .remove-category-icon {
             color: #dc3545;
@@ -34,6 +35,40 @@
         .remove-category-icon:hover {
             color: #a71d2a;
             /* Warna merah gelap */
+        }
+    </style>
+
+    <style>
+        .container {
+            width: 100%;
+            padding-right: 15px;
+            padding-left: 15px;
+            margin-right: auto;
+            margin-left: auto;
+        }
+
+        @media (min-width: 576px) {
+            .container {
+                max-width: 540px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                max-width: 720px;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .container {
+                max-width: 960px;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 90%;
+            }
         }
     </style>
 
@@ -106,7 +141,7 @@
 
     <main>
         <!-- Form Pencarian -->
-        <div class="container mt-4">
+        <div class="container mt-4" style="max-width: 1100px">
             <form action="{{ route('page.filter') }}" method="GET">
                 <div class="input-group">
                     <input type="text" name="q" class="form-control" placeholder="Cari berita..." required>
@@ -372,21 +407,23 @@
                                             <div class="trending-bottom mb-30">
                                                 <div class="row">
                                                     @foreach ($category->news as $news)
-                                                        <div class="col-lg-3">
+                                                        <div class="col-lg-3 col-md-6">
                                                             <div class="single-bottom mb-35">
                                                                 <div class="trend-bottom-img mb-30">
                                                                     <img src="https://img.youtube.com/vi/{{ $news->content_url }}/hqdefault.jpg"
                                                                         class="img-fluid" alt="Thumbnail">
                                                                 </div>
                                                                 <div class="trend-bottom-cap">
-                                                                    <a href="{{ route('page.filter', ['user' => $news->user_id]) }}">
-                                                                        <span class="font-weight-bold text-dark">{{ $news->user->name }}</span>
+                                                                    <a
+                                                                        href="{{ route('page.filter', ['user' => $news->user_id]) }}">
+                                                                        <span
+                                                                            class="font-weight-bold text-dark">{{ $news->user->name }}</span>
                                                                     </a>
-                                                                    <h4>
+                                                                    <h5>
                                                                         <a href="{{ route('news.show', $news->id) }}">
                                                                             {{ \Illuminate\Support\Str::limit($news->title, 40) }}
                                                                         </a>
-                                                                    </h4>
+                                                                    </h5>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -405,94 +442,6 @@
         </section>
         <!-- Whats New End -->
 
-
-        <!--  Recent Articles start -->
-        <div class="recent-articles">
-            <div class="container">
-                <div class="recent-wrapper">
-                    <!-- section Tittle -->
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="section-tittle mb-30">
-                                <h3>Contoh Sebuah Hasil Pencarian</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="recent-active dot-style d-flex dot-style">
-                                <div class="single-recent mb-100">
-                                    <div class="what-img">
-                                        <img src="https://img.youtube.com/vi/WCnAgy3DKOI/hqdefault.jpg"
-                                            class="img-fluid" alt="Thumbnail">
-                                    </div>
-                                    <div class="what-cap">
-                                        <span class="color1">Night party</span>
-                                        <h4><a href="#">Welcome To The Best Model Winner Contest</a></h4>
-                                    </div>
-                                </div>
-                                <div class="single-recent mb-100">
-                                    <div class="what-img">
-                                        <img src="https://img.youtube.com/vi/WCnAgy3DKOI/hqdefault.jpg"
-                                            class="img-fluid" alt="Thumbnail">
-                                    </div>
-                                    <div class="what-cap">
-                                        <span class="color1">Night party</span>
-                                        <h4><a href="#">Welcome To The Best Model Winner Contest</a></h4>
-                                    </div>
-                                </div>
-                                <div class="single-recent mb-100">
-                                    <div class="what-img">
-                                        <img src="https://img.youtube.com/vi/WCnAgy3DKOI/hqdefault.jpg"
-                                            class="img-fluid" alt="Thumbnail">
-                                    </div>
-                                    <div class="what-cap">
-                                        <span class="color1">Night party</span>
-                                        <h4><a href="#">Welcome To The Best Model Winner Contest</a></h4>
-                                    </div>
-                                </div>
-                                <div class="single-recent mb-100">
-                                    <div class="what-img">
-                                        <img src="https://img.youtube.com/vi/WCnAgy3DKOI/hqdefault.jpg"
-                                            class="img-fluid" alt="Thumbnail">
-                                    </div>
-                                    <div class="what-cap">
-                                        <span class="color1">Night party</span>
-                                        <h4><a href="#">Welcome To The Best Model Winner Contest</a></h4>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!--Recent Articles End -->
-
-
-        <!--Start pagination -->
-        <div class="pagination-area pb-45 text-center">
-            <div class="container">
-                <div class="row">
-                    <div class="col-xl-12">
-                        <div class="single-wrap d-flex justify-content-center">
-                            <nav aria-label="Page navigation example">
-                                <ul class="pagination justify-content-start">
-                                    <li class="page-item"><a class="page-link" href="#"><span
-                                                class="flaticon-arrow roted"></span></a></li>
-                                    <li class="page-item active"><a class="page-link" href="#">01</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">02</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">03</a></li>
-                                    <li class="page-item"><a class="page-link" href="#"><span
-                                                class="flaticon-arrow right-arrow"></span></a></li>
-                                </ul>
-                            </nav>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- End pagination  -->
 
 
     </main>

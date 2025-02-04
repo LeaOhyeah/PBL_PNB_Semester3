@@ -675,7 +675,7 @@ hr {
 /* scrollUp */
 /* line 443, ../../SAIFUL/Running_project/248. Magazine & News/assets/scss/_common.scss */
 #scrollUp {
-  background: #ff656a;
+  background: #000000;
   height: 50px;
   width: 50px;
   right: 31px;
@@ -4904,7 +4904,7 @@ hr {
 
 /* line 14, ../../SAIFUL/Running_project/248. Magazine & News/assets/scss/_blog_page.scss */
 .blog_area a:hover, .blog_area a :hover {
-  background: -webkit-linear-gradient(131deg, #ff656a 0%, #ff656a 99%);
+  background: -webkit-linear-gradient(131deg, #000000 0%, #000000 99%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   text-decoration: none;
