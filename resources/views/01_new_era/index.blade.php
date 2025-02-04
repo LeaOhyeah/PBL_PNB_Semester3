@@ -379,12 +379,12 @@
                                                                         class="img-fluid" alt="Thumbnail">
                                                                 </div>
                                                                 <div class="trend-bottom-cap">
-                                                                    <span
-                                                                        class="font-weight-bold">{{ $news->user->name }}
-                                                                        dari {{ $category->name }}</span>
+                                                                    <a href="{{ route('page.filter', ['user' => $news->user_id]) }}">
+                                                                        <span class="font-weight-bold text-dark">{{ $news->user->name }}</span>
+                                                                    </a>
                                                                     <h4>
-                                                                        <a href="/news/{{ $news->id }}">
-                                                                            {{ \Illuminate\Support\Str::limit($news->title, 48) }}
+                                                                        <a href="{{ route('news.show', $news->id) }}">
+                                                                            {{ \Illuminate\Support\Str::limit($news->title, 40) }}
                                                                         </a>
                                                                     </h4>
                                                                 </div>

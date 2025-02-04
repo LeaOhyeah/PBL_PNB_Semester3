@@ -111,7 +111,7 @@
                                             class="img-fluid w-100" alt="Thumbnail">
                                     </div>
                                     <div class="weekly2-caption">
-                                        <span class="color1">{{ $item->user->name }}</span>
+                                        @php echo $infoText($item) @endphp
                                         <h4>
                                             <a href="{{ route('news.show', $item->id) }}">
                                                 {{ Str::limit($item->title, 40) }}

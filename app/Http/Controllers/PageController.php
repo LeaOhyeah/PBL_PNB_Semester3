@@ -94,14 +94,19 @@ class PageController extends Controller
 
     public function filter(Request $request)
     {
-        $query = News::with('user')->verified()->latest();
-
+        $query = News::with(['user', 'category'])->verified()->latest();
         $title = null;
+        $infoText = null;
 
         if ($request->has('category')) {
             $category = Category::where('slug', $request->category)->firstOrFail();
             $query->where('category_id', $category->id);
             $title = 'Berita dari Kategori ' . $category->name;
+
+            $infoText = fn($news) =>
+            '<a href="' . route('page.filter', ['user' => $news->user->id]) . '">
+                <span class="color1">' . $news->user->name . '</span>
+            </a>';
         }
 
         if ($request->has('tag')) {
@@ -110,18 +115,33 @@ class PageController extends Controller
                 $q->where('tags.id', $tag->id);
             });
             $title = 'Berita dengan Tag ' . $tag->name;
+
+            $infoText = fn($news) =>
+            '<a href="' . route('page.filter', ['user' => $news->user->id]) . '">
+                <span class="color1">' . $news->user->name . '</span>
+            </a>';
         }
 
         if ($request->has('user')) {
             $user = User::where('id', $request->user)->firstOrFail();
             $query->where('user_id', $user->id);
             $title = 'Berita oleh ' . $user->name;
+
+            $infoText = fn($news) =>
+            '<a href="' . route('page.filter', ['category' => $news->category->slug]) . '">
+                <span class="color1">' . $news->category->name . '</span>
+            </a>';
         }
 
         if ($request->has('q')) {
             $query->where('title', 'like', '%' . $request->q . '%')
                 ->orWhere('description', 'like', '%' . $request->q . '%');
             $title = 'Hasil Pencarian untuk "' . $request->q . '"';
+
+            $infoText = fn($news) =>
+            '<a href="' . route('page.filter', ['user' => $news->user->id]) . '">
+                <span class="color1">' . $news->user->name . '</span>
+            </a>';
         }
 
         if (!$title) {
@@ -130,6 +150,6 @@ class PageController extends Controller
 
         $news = $query->paginate(16);
 
-        return view('01_new_era.page', compact('news', 'title'));
+        return view('01_new_era.page', compact('news', 'title', 'infoText'));
     }
 }
