@@ -1,7 +1,10 @@
 <?php
 
 use App\Http\Controllers\BerandaController;
+use App\Http\Controllers\PageController;
+use App\Http\Controllers\TelegramController;
 use Illuminate\Support\Facades\Route;
+use Telegram\Bot\Laravel\Facades\Telegram;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,8 +22,14 @@ use Illuminate\Support\Facades\Route;
 // });
 
 // Route::get('/', [BerandaController::class, 'index']);
-Route::get('/', [BerandaController::class, 'test']);
+// Route::get('/', [BerandaController::class, 'test']);
 Route::get('/{id}', [BerandaController::class, 'testDetail'])->name('single');
 
 Route::get('/search', [BerandaController::class, 'search'])->name('search');
 // Route::get('/search?q=data', [BerandaController::class, 'search'])->name('search');
+
+Route::post('/webhook', [TelegramController::class, 'webhook']);
+
+Route::get('/', [PageController::class, 'index']);
+Route::get('/news/{id}', [PageController::class, 'news'])->name('news.show');
+Route::get('/page/filter', [PageController::class, 'filter'])->name('page.filter');
