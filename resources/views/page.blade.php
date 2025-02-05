@@ -3,6 +3,8 @@
 @push('styles')
     <link rel="stylesheet" href="{{ asset('template/assets/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('template/assets/css/owl.carousel.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('template/assets/css/ticker-style.css') }}">
+    <link rel="stylesheet" href="{{ asset('template/assets/css/flaticon.css') }}">
     <link rel="stylesheet" href="{{ asset('template/assets/css/slicknav.css') }}">
     <link rel="stylesheet" href="{{ asset('template/assets/css/animate.min.css') }}">
     <link rel="stylesheet" href="{{ asset('template/assets/css/magnific-popup.css') }}">
@@ -11,7 +13,6 @@
     <link rel="stylesheet" href="{{ asset('template/assets/css/slick.css') }}">
     <link rel="stylesheet" href="{{ asset('template/assets/css/nice-select.css') }}">
     <link rel="stylesheet" href="{{ asset('template/assets/css/style.css') }}">
-    <link rel="stylesheet" href="{{ asset('template/assets/css/responsive.css') }}">
 
     <style>
         a:hover {
@@ -53,76 +54,65 @@
 @endpush
 
 @section('title')
-    {{ env('APP_NAME') }} - {{ $news->title }}
+    {{ env('APP_NAME') }} - {{ $title }}
 @endsection
 
 @section('content')
-    <section class="blog_area single-post-area pt-3">
+    <div class="weekly2-news-area pt-10">
         <div class="container">
-            <div class="row">
-                <div class="col-lg-8 posts-list">
-                    <div class="single-post">
-                        <div class="feature-img">
-                            <div class="embed-responsive embed-responsive-16by9">
-                                <iframe class="embed-responsive-item"
-                                    src="https://www.youtube.com/embed/{{ $news->content_url }}" allowfullscreen></iframe>
+            <div class="weekly2-wrapper">
+                <!-- section Tittle -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="section-tittle mb-30">
+                            <h3>{{ $title }}</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grid Berita -->
+                <div class="row">
+                    @foreach ($news as $item)
+                        <div class="col-lg-3 col-sm-6 mb-4">
+                            <div class="weekly2-single">
+                                <div class="weekly2-img">
+                                    <img src="https://img.youtube.com/vi/{{ $item->content_url }}/hqdefault.jpg"
+                                        class="img-fluid w-100" alt="Thumbnail">
+                                </div>
+                                <div class="weekly2-caption">
+                                    @php echo $infoText($item) @endphp
+                                    <h4>
+                                        <a href="{{ route('news.show', $item->id) }}">
+                                            {{ Str::limit($item->title, 50) }}
+                                        </a>
+                                    </h4>
+                                </div>
                             </div>
                         </div>
-                        <div class="blog_details">
-                            <h2>{{ $news->title }}
-                            </h2>
-                            <ul class="blog-info-link mt-3 mb-4">
-                                <li><a href="{{ route('page.filter', ['user' => $news->user_id]) }}"><i
-                                            class="fa fa-user"></i>{{ $news->user->name }}</a></li>
-                                <li><i class="fa fa-clock"></i>{{ $news->created_at }}</li>
-                            </ul>
-                            <p class="excert">
-                                {{ $news->description }}
-                            </p>
+                    @endforeach
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination-area pb-45 text-center">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-xl-12">
+                                <div class="single-wrap d-flex justify-content-center">
+                                    {{ $news->links() }}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4">
-                    <div class="blog_right_sidebar">
-                        <aside class="single_sidebar_widget popular_post_widget" style="padding: 20px!important;">
-                            <h3 class="widget_title">Postinga Serupa</h3>
-                            @foreach ($related_news as $item)
-                                <div class="media post_item">
-                                    <img style="max-height: 90px;"
-                                        src="https://img.youtube.com/vi/{{ $item->content_url }}/hqdefault.jpg"
-                                        alt="post">
-                                    <div class="media-body">
-                                        <a href="{{ route('news.show', $item->id) }}">
-                                            <h3>{{ \Illuminate\Support\Str::limit($item->title, 40) }}</h3>
-                                        </a>
-                                        <p>{{ $item->created_at }}</p>
-                                    </div>
-                                </div>
-                            @endforeach
-
-                        </aside>
-                        <aside class="single_sidebar_widget">
-                            <h4 class="widget_title">Tagar</h4>
-
-                            @foreach ($news->tags as $tag)
-                                <a class="text-dark ml-3"
-                                    href="{{ route('page.filter', ['tag' => $tag->name]) }}">#{{ $tag->name }}</a>
-                            @endforeach
-
-                        </aside>
-                    </div>
-                </div>
+                <!-- End Pagination -->
             </div>
         </div>
-    </section>
+    </div>
 @endsection
 
 @push('scripts')
     <!-- All JS Custom Plugins Link Here here -->
     <script src="{{ asset('template/./assets/js/vendor/modernizr-3.5.0.min.js') }}"></script>
-    <script src="{{ asset('template/./assets/js/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('template/./assets/js/popper.min.js') }}"></script>
-    <script src="{{ asset('template/./assets/js/bootstrap.min.js') }}"></script>
 
     <!-- Jquery, Popper, Bootstrap -->
     <script src="{{ asset('template/./assets/js/vendor/jquery-1.12.4.min.js') }}"></script>
@@ -141,12 +131,25 @@
     <script src="{{ asset('template/./assets/js/animated.headline.js') }}"></script>
     <script src="{{ asset('template/./assets/js/jquery.magnific-popup.js') }}"></script>
 
+    <!-- Breaking New Pluging -->
+    <script src="{{ asset('template/./assets/js/jquery.ticker.js') }}"></script>
+    <script src="{{ asset('template/./assets/js/site.js') }}"></script>
+
     <!-- Scrollup, nice-select, sticky -->
     <script src="{{ asset('template/./assets/js/jquery.scrollUp.min.js') }}"></script>
     <script src="{{ asset('template/./assets/js/jquery.nice-select.min.js') }}"></script>
     <script src="{{ asset('template/./assets/js/jquery.sticky.js') }}"></script>
 
+    <!-- contact js -->
+    <script src="{{ asset('template/./assets/js/contact.js') }}"></script>
+    <script src="{{ asset('template/./assets/js/jquery.form.js') }}"></script>
+    <script src="{{ asset('template/./assets/js/jquery.validate.min.js') }}"></script>
+    <script src="{{ asset('template/./assets/js/mail-script.js') }}"></script>
+    <script src="{{ asset('template/./assets/js/jquery.ajaxchimp.min.js') }}"></script>
+
     <!-- Jquery Plugins, main Jquery -->
     <script src="{{ asset('template/./assets/js/plugins.js') }}"></script>
     <script src="{{ asset('template/./assets/js/main.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
 @endpush

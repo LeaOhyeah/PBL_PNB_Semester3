@@ -66,7 +66,7 @@ class PageController extends Controller
         });
 
         // dd($by_categories);
-        $categories = Category::all();
+        $categories = Category::latest()->get();
         $tags = Tag::all();
 
         $data = [
@@ -80,7 +80,7 @@ class PageController extends Controller
         ];
 
         // dd($data['categories']);
-        return view('01_new_era.index', $data);
+        return view('index', $data);
     }
 
 
@@ -124,9 +124,10 @@ class PageController extends Controller
         $data = [
             'news' => $news,
             'related_news' => $relatedNews,
+            'categories' => Category::latest()->get()
         ];
 
-        return view('01_new_era.single', $data);
+        return view('single', $data);
     }
 
 
@@ -187,8 +188,40 @@ class PageController extends Controller
             abort(404);
         }
 
-        $news = $query->paginate(16);
+        $news = $query->paginate(16)->appends(request()->query());
 
-        return view('01_new_era.page', compact('news', 'title', 'infoText'));
+        $categories = Category::latest()->get();
+
+        return view('page', compact('news', 'title', 'infoText', 'categories'));
+    }
+
+
+
+    public function latest()
+    {
+        $latestByCategories = Category::with('news.user')->orderBy('created_at', 'desc')->get()->map(function ($category) {
+            $filteredNews = $category->news->where('verified_at', '!=', null)
+                ->take(12);
+            $category->setRelation('news', $filteredNews);
+            return $category;
+        });
+
+
+        $data = [
+            'latest_news' => News::latest()->verified()->limit(20)->get(),
+            'latest_by_categories' => $latestByCategories,
+            'categories' => Category::latest()->get()
+        ];
+
+        return view('latest', $data);
+    }
+
+
+    public function about()
+    {
+        $data = [
+            'categories' => Category::latest()->get(),
+        ];
+        return view('about', $data);
     }
 }
